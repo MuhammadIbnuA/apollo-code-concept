@@ -3,7 +3,11 @@
 import React, { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { Play, CheckCircle, AlertCircle, User, Menu } from "lucide-react";
-import CodeEditor from "@/components/Editor/CodeEditor";
+import dynamic from "next/dynamic";
+const CodeEditor = dynamic(() => import("@/components/Editor/CodeEditor"), {
+    ssr: false,
+    loading: () => <div className="h-full w-full flex items-center justify-center text-gray-500 bg-[#1e1e2e]">Loading Editor...</div>
+});
 import { runCode } from "@/lib/judge0";
 import { Lesson } from "@/lib/db"; // Use the shared Type from DB (or Client version)
 import { cn } from "@/lib/utils";
@@ -90,7 +94,8 @@ export default function StudentWorkspace({ lesson, allLessons = [] }: StudentWor
 
             // 4. Submit to Backend
             if (studentName) {
-                await submitAttempt(lesson.id, newStatus, code);
+                const apiStatus = newStatus === 'wrong_answer' ? 'failure' : newStatus;
+                await submitAttempt(lesson.id, apiStatus, code);
                 // Progress is auto-refreshed by context
             }
 

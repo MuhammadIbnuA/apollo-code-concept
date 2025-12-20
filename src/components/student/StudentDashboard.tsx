@@ -57,6 +57,10 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <Link href="/exams" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full font-bold text-sm transition-colors border border-blue-500/50 shadow-[0_0_15px_rgba(37,99,235,0.3)]">
+                        Take an Exam
+                    </Link>
+
                     <div className="bg-[#1e1e2e] border border-gray-700 rounded-full px-4 py-2 flex items-center gap-3 shadow-lg cursor-pointer" onClick={() => setShowNameModal(true)}>
                         <div className="bg-gradient-to-tr from-yellow-400 to-orange-500 rounded-full p-1">
                             <User size={16} className="text-white" />

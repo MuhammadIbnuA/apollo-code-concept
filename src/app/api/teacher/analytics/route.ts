@@ -1,18 +1,25 @@
 
-import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
 
-export const dynamic = 'force-dynamic';
-
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const submissions = await db.getAllSubmissions();
-        // Here we could also calculate aggregate stats if needed
-        return NextResponse.json({
-            submissions,
-            total: submissions.length
-        });
-    } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
+        const { searchParams } = new URL(request.url);
+        const examId = searchParams.get('examId');
+
+        if (!examId) {
+            // Global Analytics (for TeacherDashboard)
+            const submissions = await db.getAllSubmissions();
+            return NextResponse.json({
+                total: submissions.length,
+                submissions: submissions
+            });
+        }
+
+        const analytics = await db.getExamAnalytics(examId);
+        return NextResponse.json(analytics);
+    } catch (e: any) {
+        console.error("Analytics Error:", e);
+        return NextResponse.json({ error: e.message || 'Failed to fetch analytics' }, { status: 500 });
     }
 }

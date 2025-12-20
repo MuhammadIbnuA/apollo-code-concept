@@ -20,8 +20,8 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
                     <Link href="/teacher/lessons" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all">
                         <BookOpen size={20} /> Lesson Manager
                     </Link>
-                    <Link href="/teacher" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all">
-                        <BarChart2 size={20} /> Analytics
+                    <Link href="/teacher/exams" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all">
+                        <BarChart2 size={20} /> Exam & Analytics
                     </Link>
                 </nav>
 

@@ -1,6 +1,6 @@
 
 import { db } from "@/lib/db";
-import StudentWorkspace from "@/components/student/StudentWorkspace";
+import StudentWorkspaceWrapper from "@/components/student/StudentWorkspaceWrapper";
 import { notFound } from "next/navigation";
 
 interface PageProps {
@@ -17,6 +17,6 @@ export default async function LessonPage({ params }: PageProps) {
     }
 
     return (
-        <StudentWorkspace lesson={lesson} allLessons={allLessons.filter(l => l.isPublic)} />
+        <StudentWorkspaceWrapper lesson={lesson} allLessons={allLessons.filter(l => l.isPublic)} />
     );
 }
