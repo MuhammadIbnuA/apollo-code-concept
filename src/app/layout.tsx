@@ -13,9 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PyZero - Python Learning",
+  title: "Apollo Learning Platform - Python Learning",
   description: "Learn Python from zero with interactive tasks.",
 };
+
+import { AppProvider } from "@/context/AppContext";
 
 export default function RootLayout({
   children,
@@ -28,7 +30,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
+        <AppProvider>
+          {children}
+        </AppProvider>
       </body>
     </html>
   );

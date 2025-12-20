@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Prevent Next.js/Turbopack from trying to bundle 'pg', which causes panics/crashes
+  serverExternalPackages: ["pg"],
 };
 
 export default nextConfig;
