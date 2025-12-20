@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Save, ArrowLeft, Eye } from "lucide-react";
+import { Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Lesson } from "@/lib/db";
@@ -189,7 +189,7 @@ export default function TeacherLessonEditor({ lessonId }: TeacherLessonEditorPro
                                     value={form.validationCode || ""}
                                     onChange={e => setForm({ ...form, validationCode: e.target.value })}
                                 />
-                                <p className="text-xs text-gray-500 mt-2">This code is appended to user's code. Use <code>assert</code> to check variables.</p>
+                                <p className="text-xs text-gray-500 mt-2">This code is appended to user&apos;s code. Use <code>assert</code> to check variables.</p>
                             </div>
                         ) : (
                             <div>

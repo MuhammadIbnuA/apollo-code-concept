@@ -100,7 +100,11 @@ export interface ExamAnalytics {
 let isInitialized = false;
 let initPromise: Promise<void> | null = null;
 
-const seedCurriculum = async (client: { query: (q: string, v?: any[]) => Promise<any> }) => {
+interface PgClient {
+    query: (text: string, params?: unknown[]) => Promise<{ rows: { count: string }[] }>;
+}
+
+const seedCurriculum = async (client: PgClient) => {
     // Check if we have any public lessons
     const res = await client.query("SELECT COUNT(*) FROM lessons WHERE is_public = true");
     if (parseInt(res.rows[0].count) === 0) {

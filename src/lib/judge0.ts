@@ -32,9 +32,11 @@ export async function submitCode(sourceCode: string): Promise<string> {
         console.log("[Judge0] Submission successful. Token:", response.data.token);
         return response.data.token;
     } catch (error: unknown) {
-        const err = error as any;
-        console.error("[Judge0] Submission Error:", err.response?.data || err.message);
-        throw new Error(err.response?.data?.details || "Failed to submit code to Judge0");
+        if (axios.isAxiosError(error)) {
+            console.error("[Judge0] Submission Error:", error.response?.data || error.message);
+            throw new Error(error.response?.data?.details || "Failed to submit code to Judge0");
+        }
+        throw new Error("Failed to submit code: " + (error as Error).message);
     }
 }
 
@@ -48,9 +50,11 @@ export async function getSubmissionStatus(token: string): Promise<ExecutionResul
         });
         return response.data;
     } catch (error: unknown) {
-        const err = error as any;
-        console.error("[Judge0] Polling Error:", err.response?.data || err.message);
-        throw new Error(err.response?.data?.details || "Failed to get submission status");
+        if (axios.isAxiosError(error)) {
+            console.error("[Judge0] Polling Error:", error.response?.data || error.message);
+            throw new Error(error.response?.data?.details || "Failed to get submission status");
+        }
+        throw new Error("Failed to get status: " + (error as Error).message);
     }
 }
 
@@ -71,8 +75,10 @@ export async function runCode(sourceCode: string): Promise<ExecutionResult> {
         console.log("[Judge0] Execution result:", response.data);
         return response.data;
     } catch (error: unknown) {
-        const err = error as any;
-        console.error("[Judge0] Execution Error:", err.response?.data || err.message);
-        throw new Error(err.response?.data?.details || "Failed to execute code");
+        if (axios.isAxiosError(error)) {
+            console.error("[Judge0] Execution Error:", error.response?.data || error.message);
+            throw new Error(error.response?.data?.details || "Failed to execute code");
+        }
+        throw new Error("Failed to execute code: " + (error as Error).message);
     }
 }

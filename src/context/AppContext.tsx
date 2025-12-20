@@ -28,14 +28,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setIsInitialized(true);
     }, []);
 
-    // 2. Persist Name
-    useEffect(() => {
-        if (isInitialized) {
-            localStorage.setItem("apollo_student_name", studentName);
-            if (studentName) refreshProgress();
-        }
-    }, [studentName, isInitialized]);
-
     // 3. Fetch Progress (Points & Completions)
     const refreshProgress = useCallback(async () => {
         if (!studentName) return;
@@ -48,6 +40,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             console.error("Failed to refresh progress:", e);
         }
     }, [studentName]);
+
+    // 2. Persist Name
+    useEffect(() => {
+        if (isInitialized) {
+            localStorage.setItem("apollo_student_name", studentName);
+            if (studentName) refreshProgress();
+        }
+    }, [studentName, isInitialized, refreshProgress]);
 
     // 4. Submit Attempt
     const submitAttempt = async (lessonId: string, status: 'success' | 'failure' | 'error', code: string) => {
