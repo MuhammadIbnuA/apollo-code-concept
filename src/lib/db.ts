@@ -80,7 +80,7 @@ export interface ExamSubmission {
     examId: string;
     studentName: string;
     score: number;
-    answers: any; // JSON
+    answers: Record<string, string>; // JSON
     timeTakenSeconds: number;
     timestamp: string;
 }
@@ -100,7 +100,7 @@ export interface ExamAnalytics {
 let isInitialized = false;
 let initPromise: Promise<void> | null = null;
 
-const seedCurriculum = async (client: any) => {
+const seedCurriculum = async (client: { query: (q: string, v?: any[]) => Promise<any> }) => {
     // Check if we have any public lessons
     const res = await client.query("SELECT COUNT(*) FROM lessons WHERE is_public = true");
     if (parseInt(res.rows[0].count) === 0) {
@@ -464,7 +464,7 @@ export const db = {
     getExamSubmissions: async (examId?: string) => {
         await ensureDbInitialized();
         let query = `SELECT * FROM exam_submissions`;
-        const values: any[] = [];
+        const values: (string | number)[] = [];
         if (examId) {
             query += ` WHERE exam_id = $1`;
             values.push(examId);
@@ -476,6 +476,7 @@ export const db = {
 };
 
 // Helper Mappers (Extended)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapRowToExam(row: any): Exam {
     return {
         id: row.id,
@@ -488,6 +489,7 @@ function mapRowToExam(row: any): Exam {
     };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapRowToExamSubmission(row: any): ExamSubmission {
     return {
         id: row.id,
@@ -500,6 +502,7 @@ function mapRowToExamSubmission(row: any): ExamSubmission {
     };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapRowToLesson(row: any): Lesson {
     return {
         id: row.id,
@@ -516,6 +519,7 @@ function mapRowToLesson(row: any): Lesson {
     };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function mapRowToSubmission(row: any): Submission {
     return {
         id: row.id,
