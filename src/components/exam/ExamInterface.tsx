@@ -40,6 +40,13 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
     const currentCode = answers[currentQuestion.id] || currentQuestion.initialCode;
     const currentOutput = outputs[currentQuestion.id] || "";
 
+    // Show name modal on first load if no student name
+    useEffect(() => {
+        if (!studentName) {
+            setShowNameModal(true);
+        }
+    }, [studentName]);
+
     // Initialize answers
     useEffect(() => {
         const initialAnswers: Record<string, string> = {};

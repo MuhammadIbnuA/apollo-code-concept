@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ExternalLink, Plus, Edit2 } from "lucide-react";
+import { ExternalLink, Plus, Edit2, Share2, Check } from "lucide-react";
 import Link from "next/link";
 import { Exam } from "@/lib/types";
 
 export default function TeacherExamsPage() {
     const [exams, setExams] = useState<Exam[]>([]);
     const [loading, setLoading] = useState(true);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
 
     useEffect(() => {
         fetch('/api/admin/exams')
@@ -23,6 +24,14 @@ export default function TeacherExamsPage() {
                 setLoading(false);
             });
     }, []);
+
+    const copyShareLink = (examId: string) => {
+        const url = `${window.location.origin}/exam/${examId}`;
+        navigator.clipboard.writeText(url).then(() => {
+            setCopiedId(examId);
+            setTimeout(() => setCopiedId(null), 2000);
+        });
+    };
 
     if (loading) return <div className="p-8 text-white">Loading Exams...</div>;
 
@@ -71,6 +80,16 @@ export default function TeacherExamsPage() {
                             >
                                 <Edit2 size={18} />
                             </Link>
+                            <button
+                                onClick={() => copyShareLink(exam.id)}
+                                className={`p-2 rounded-lg transition-colors ${copiedId === exam.id
+                                        ? 'bg-green-600 text-white'
+                                        : 'bg-orange-600 hover:bg-orange-700 text-white'
+                                    }`}
+                                title={copiedId === exam.id ? "Link Copied!" : "Copy Share Link"}
+                            >
+                                {copiedId === exam.id ? <Check size={18} /> : <Share2 size={18} />}
+                            </button>
                             <Link
                                 href={`/exam/${exam.id}`}
                                 className="p-2 bg-[#27273a] hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors"
