@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { examId, studentName, score, answers } = body;
+        const { examId, studentName, score, answers, timeTakenSeconds } = body;
 
         if (!examId || !studentName || score === undefined || !answers) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
             studentName,
             score,
             answers,
+            timeTakenSeconds: timeTakenSeconds || 0,
             timestamp: new Date().toISOString()
         });
 
