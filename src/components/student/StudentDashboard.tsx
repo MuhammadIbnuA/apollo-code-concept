@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { CheckCircle, Play, Lock, User } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
-import { Lesson } from "@/lib/db";
+import { Lesson } from "@/lib/types";
 
 export default function StudentDashboard() {
     const { studentName, setStudentName, points, completedLessons } = useAppContext();

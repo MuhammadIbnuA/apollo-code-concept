@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Edit2, Link as LinkIcon, Globe, Lock } from "lucide-react";
 import Link from "next/link";
-import { Lesson } from "@/lib/db";
+import { Lesson } from "@/lib/types";
 
 export default function LessonManager() {
     const [lessons, setLessons] = useState<Lesson[]>([]);

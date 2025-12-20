@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import React from "react";
-import { Lesson } from "@/lib/db";
+import { Lesson } from "@/lib/types";
 
 // Dynamically import the actual workspace with SSR disabled
 const StudentWorkspace = dynamic(() => import("./StudentWorkspace"), {

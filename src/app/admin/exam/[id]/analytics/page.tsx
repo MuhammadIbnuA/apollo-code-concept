@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Clock, Award, Users, Target, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { ExamAnalytics, ExamSubmission } from "@/lib/db";
+import { ExamAnalytics, ExamSubmission } from "@/lib/types";
 
 interface PageProps {
     params: Promise<{ id: string }>;

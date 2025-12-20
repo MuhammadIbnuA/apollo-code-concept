@@ -1,7 +1,7 @@
 
 import ClientOnly from "@/components/ClientOnly";
 import LessonView from "@/components/LessonView";
-import { Lesson } from "@/lib/db";
+import { Lesson } from "@/lib/types";
 
 // Since we can't do DB calls directly in server component neatly without being async
 // and we want to reuse LessonView which is client, let's fetch in a server component wrapper

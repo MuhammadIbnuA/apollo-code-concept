@@ -1,17 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Plus, Edit2 } from "lucide-react";
 import Link from "next/link";
-import { Exam } from "@/lib/db";
+import { Exam } from "@/lib/types";
 
 export default function TeacherExamsPage() {
     const [exams, setExams] = useState<Exam[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch all exams (using admin endpoint for now as it returns list)
-        // Ideally we might want a specific teacher endpoint, but this works if open.
         fetch('/api/admin/exams')
             .then(res => res.json())
             .then(data => {
@@ -30,7 +28,16 @@ export default function TeacherExamsPage() {
 
     return (
         <div className="p-8 pb-32 max-w-6xl mx-auto text-white">
-            <h1 className="text-3xl font-bold mb-8">Exam Management & Review</h1>
+            <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold">Exam Management</h1>
+                <Link
+                    href="/teacher/exams/new"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-bold transition-colors"
+                >
+                    <Plus size={20} />
+                    Create Exam
+                </Link>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {exams.map(exam => (
@@ -58,6 +65,13 @@ export default function TeacherExamsPage() {
                                 <span>View Results</span>
                             </Link>
                             <Link
+                                href={`/teacher/exams/${exam.id}/edit`}
+                                className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                title="Edit Exam"
+                            >
+                                <Edit2 size={18} />
+                            </Link>
+                            <Link
                                 href={`/exam/${exam.id}`}
                                 className="p-2 bg-[#27273a] hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors"
                                 title="Preview Exam"
@@ -70,8 +84,15 @@ export default function TeacherExamsPage() {
                 ))}
 
                 {exams.length === 0 && (
-                    <div className="col-span-full text-center py-10 text-gray-500 bg-[#1e1e2e] rounded-xl border border-[#27273a]">
-                        No exams found. Go to Admin Dashboard to create one.
+                    <div className="col-span-full text-center py-10 bg-[#1e1e2e] rounded-xl border border-[#27273a]">
+                        <p className="text-gray-500 mb-4">No exams found. Create your first exam!</p>
+                        <Link
+                            href="/teacher/exams/new"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold transition-colors"
+                        >
+                            <Plus size={20} />
+                            Create Exam
+                        </Link>
                     </div>
                 )}
             </div>

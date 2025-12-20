@@ -9,7 +9,7 @@ const CodeEditor = dynamic(() => import("@/components/Editor/CodeEditor"), {
     loading: () => <div className="h-full w-full flex items-center justify-center text-gray-500 bg-[#1e1e2e]">Loading Editor...</div>
 });
 import { runCode } from "@/lib/judge0";
-import { Lesson } from "@/lib/db";
+import { Lesson } from "@/lib/types";
 import { useAppContext } from "@/context/AppContext";
 
 interface LessonViewProps {

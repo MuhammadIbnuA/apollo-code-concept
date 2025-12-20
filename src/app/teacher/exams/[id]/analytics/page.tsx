@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, Clock, Award, Users, Target, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import { ExamAnalytics, ExamSubmission } from "@/lib/db";
+import { ExamAnalytics, ExamSubmission } from "@/lib/types";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -138,27 +138,73 @@ export default function TeacherAnalyticsPage({ params }: PageProps) {
                 {/* Submission Detail Modal */}
                 {selectedSubmission && (
                     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-                        <div className="bg-[#1e1e2e] w-full max-w-4xl h-[80vh] rounded-xl border border-[#27273a] flex flex-col shadow-2xl">
+                        <div className="bg-[#1e1e2e] w-full max-w-5xl h-[85vh] rounded-xl border border-[#27273a] flex flex-col shadow-2xl">
                             <div className="p-4 border-b border-[#27273a] flex justify-between items-center">
                                 <div>
                                     <h3 className="font-bold text-lg">{selectedSubmission.studentName}&apos;s Submission</h3>
-                                    <p className="text-gray-400 text-sm">Score: {selectedSubmission.score}</p>
+                                    <p className="text-gray-400 text-sm">Score: {selectedSubmission.score} / {data.totalPoints}</p>
                                 </div>
-                                <button onClick={() => setSelectedSubmission(null)} className="p-2 hover:bg-white/10 rounded">X</button>
+                                <button onClick={() => setSelectedSubmission(null)} className="p-2 hover:bg-white/10 rounded text-gray-400 hover:text-white">✕</button>
                             </div>
-                            <div className="flex-1 overflow-auto p-0 flex flex-col md:flex-row">
-                                <div className="flex-1 p-4 border-r border-[#27273a] bg-[#0f0f16]">
-                                    <h4 className="text-xs uppercase text-gray-500 font-bold mb-2">Answers Code</h4>
+                            <div className="flex-1 overflow-auto p-0 flex flex-col lg:flex-row">
+                                {/* Code Panel */}
+                                <div className="flex-1 p-4 border-r border-[#27273a] bg-[#0f0f16] overflow-auto">
+                                    <h4 className="text-xs uppercase text-gray-500 font-bold mb-3">Student Code</h4>
                                     <div className="space-y-4">
                                         {Object.entries(selectedSubmission.answers).map(([qId, code]) => (
                                             <div key={qId} className="mb-4">
                                                 <div className="text-xs text-blue-400 mb-1 font-mono">{qId}</div>
-                                                <pre className="p-3 bg-[#161622] rounded border border-[#27273a] text-xs font-mono overflow-x-auto text-gray-300">
+                                                <pre className="p-3 bg-[#161622] rounded border border-[#27273a] text-xs font-mono overflow-x-auto text-gray-300 max-h-48 overflow-y-auto">
                                                     {code as string}
                                                 </pre>
                                             </div>
                                         ))}
                                     </div>
+                                </div>
+
+                                {/* Grade Breakdown Panel */}
+                                <div className="w-full lg:w-80 p-4 bg-[#161622] overflow-auto">
+                                    <h4 className="text-xs uppercase text-gray-500 font-bold mb-3">Grade Breakdown</h4>
+                                    {selectedSubmission.gradeDetails ? (
+                                        <div className="space-y-3">
+                                            {Object.entries(selectedSubmission.gradeDetails).map(([qId, grade]) => (
+                                                <div key={qId} className="bg-[#0f0f16] p-3 rounded-lg border border-[#27273a]">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <span className="text-xs text-blue-400 font-mono">{qId}</span>
+                                                        <span className={`text-sm font-bold px-2 py-0.5 rounded ${grade.score === grade.maxScore
+                                                            ? 'bg-green-500/20 text-green-400'
+                                                            : grade.score > 0
+                                                                ? 'bg-yellow-500/20 text-yellow-400'
+                                                                : 'bg-red-500/20 text-red-400'
+                                                            }`}>
+                                                            {grade.score} / {grade.maxScore}
+                                                        </span>
+                                                    </div>
+                                                    {/* Criteria Breakdown */}
+                                                    {Object.keys(grade.breakdown).length > 0 && (
+                                                        <div className="space-y-1 mt-2 text-xs">
+                                                            {Object.entries(grade.breakdown).map(([criteria, pts]) => (
+                                                                <div key={criteria} className="flex justify-between text-gray-400">
+                                                                    <span>{criteria}</span>
+                                                                    <span className="text-gray-300">{pts} pts</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {/* Errors */}
+                                                    {grade.errors.length > 0 && (
+                                                        <div className="mt-2 text-xs text-red-400">
+                                                            {grade.errors.map((err, i) => (
+                                                                <div key={i}>• {err}</div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No breakdown available (legacy submission)</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

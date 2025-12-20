@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lesson } from "@/lib/db";
+import { Lesson } from "@/lib/types";
 
 interface TeacherLessonEditorProps {
     lessonId?: string; // If undefined, it's new

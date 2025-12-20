@@ -31,70 +31,18 @@ const globalWithPg = global as GlobalWithPg;
 const pool = globalWithPg.pgPool || new Pool(getDbConfig());
 if (process.env.NODE_ENV !== 'production') globalWithPg.pgPool = pool;
 
-// --- TYPES ---
+// --- TYPES (Re-exported from shared types) ---
+export type {
+    Lesson,
+    Submission,
+    Question,
+    Exam,
+    GradeResult,
+    ExamSubmission,
+    ExamAnalytics
+} from './types';
 
-export interface Lesson {
-    id: string;
-    title: string;
-    description: string;
-    task: string;
-    content: string;
-    initialCode: string;
-    expectedOutput?: string;
-    validationCode?: string;
-    validationType: 'output' | 'code';
-    isPublic: boolean;
-    createdAt: string;
-}
-
-export interface Submission {
-    id?: number;
-    lessonId: string;
-    studentName: string;
-    status: 'success' | 'failure' | 'error';
-    code: string;
-    timestamp: string;
-}
-
-export interface Question {
-    id: string;
-    title: string;
-    description: string;
-    initialCode: string;
-    validationCode: string; // Hidden assertions
-    points: number;
-}
-
-export interface Exam {
-    id: string;
-    title: string;
-    description: string;
-    durationMinutes: number;
-    questions: Question[]; // Stored as JSON string in DB
-    isPublic: boolean;
-    createdAt: string;
-}
-
-export interface ExamSubmission {
-    id?: number;
-    examId: string;
-    studentName: string;
-    score: number;
-    answers: Record<string, string>; // JSON
-    timeTakenSeconds: number;
-    timestamp: string;
-}
-
-export interface ExamAnalytics {
-    examTitle: string;
-    totalPoints: number;
-    completionRate: string; // "X / Y" (unique / expected invalid, so just unique count)
-    passRate: number;
-    firstAttemptSuccess: number;
-    averageScore: number;
-    averageTime: number; // seconds
-    submissions: ExamSubmission[];
-}
+import type { Lesson, Submission, Question, Exam, GradeResult, ExamSubmission, ExamAnalytics } from './types';
 
 // --- INITIALIZATION ---
 let isInitialized = false;
@@ -206,6 +154,16 @@ const ensureDbInitialized = () => {
                 `);
                 if (checkCol.rows.length === 0) {
                     await client.query(`ALTER TABLE exam_submissions ADD COLUMN time_taken_seconds INTEGER DEFAULT 0`);
+                }
+
+                // Migration: Add grade_details column for rubric scoring
+                const checkGradeDetails = await client.query(`
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name='exam_submissions' AND column_name='grade_details'
+                `);
+                if (checkGradeDetails.rows.length === 0) {
+                    await client.query(`ALTER TABLE exam_submissions ADD COLUMN grade_details TEXT`);
                 }
 
                 // 3. Seed Data
@@ -360,14 +318,15 @@ export const db = {
     submitExamAttempt: async (submission: ExamSubmission) => {
         await ensureDbInitialized();
         const answersJson = JSON.stringify(submission.answers);
+        const gradeDetailsJson = submission.gradeDetails ? JSON.stringify(submission.gradeDetails) : null;
         const query = `
-            INSERT INTO exam_submissions (exam_id, student_name, score, answers, time_taken_seconds, timestamp)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO exam_submissions (exam_id, student_name, score, answers, grade_details, time_taken_seconds, timestamp)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING *;
         `;
         const values = [
             submission.examId, submission.studentName, submission.score,
-            answersJson, submission.timeTakenSeconds || 0, submission.timestamp
+            answersJson, gradeDetailsJson, submission.timeTakenSeconds || 0, submission.timestamp
         ];
         const res = await pool.query(query, values);
         return mapRowToExamSubmission(res.rows[0]);
@@ -501,6 +460,7 @@ function mapRowToExamSubmission(row: any): ExamSubmission {
         studentName: row.student_name,
         score: row.score,
         answers: row.answers ? JSON.parse(row.answers) : {},
+        gradeDetails: row.grade_details ? JSON.parse(row.grade_details) : undefined,
         timeTakenSeconds: row.time_taken_seconds || 0,
         timestamp: row.timestamp
     };

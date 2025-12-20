@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Exam } from "@/lib/db";
+import { Exam } from "@/lib/types";
 import { Clock, ArrowRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 

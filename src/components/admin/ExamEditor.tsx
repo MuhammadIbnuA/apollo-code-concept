@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Plus, Trash, Save, ArrowLeft } from "lucide-react";
-import { Exam, Question } from "@/lib/db";
+import { Exam, Question } from "@/lib/types";
 import { useRouter } from "next/navigation";
 
 const CodeEditor = dynamic(() => import("@/components/Editor/CodeEditor"), { ssr: false });
@@ -46,7 +46,9 @@ export default function ExamEditor({ id }: ExamEditorProps) {
             description: "Describe the problem...",
             initialCode: "# Write code here",
             validationCode: "# assert x == 1",
-            points: 10
+            points: 10,
+            gradingType: 'assertion',
+            hints: ''
         };
         setExam(prev => ({ ...prev, questions: [...prev.questions, newQ] }));
     };
@@ -209,6 +211,30 @@ export default function ExamEditor({ id }: ExamEditorProps) {
                                         value={q.description}
                                         onChange={e => updateQuestion(idx, 'description', e.target.value)}
                                     />
+                                </div>
+
+                                {/* Grading Settings */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Grading Type</label>
+                                        <select
+                                            className="w-full bg-[#161622] border border-[#27273a] p-2 rounded text-white"
+                                            value={q.gradingType || 'assertion'}
+                                            onChange={e => updateQuestion(idx, 'gradingType', e.target.value)}
+                                        >
+                                            <option value="assertion">Simple Assertion (Pass/Fail)</option>
+                                            <option value="rubric">Rubric Scoring (Breakdown)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Hints for Students (Optional)</label>
+                                        <input
+                                            className="w-full bg-[#161622] border border-[#27273a] p-2 rounded text-white text-sm"
+                                            placeholder="e.g., Use a for loop and % operator"
+                                            value={q.hints || ''}
+                                            onChange={e => updateQuestion(idx, 'hints', e.target.value)}
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

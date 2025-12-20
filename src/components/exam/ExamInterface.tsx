@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Exam } from "@/lib/db";
+import { Exam, GradeResult } from "@/lib/types";
 import dynamic from "next/dynamic";
-import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, Save } from "lucide-react";
+import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, Save, Lightbulb } from "lucide-react";
 import { runCode } from "@/lib/judge0";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/AppContext";
@@ -26,12 +26,13 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
     const [timeLeft, setTimeLeft] = useState(exam.durationMinutes * 60);
     const [isRunning, setIsRunning] = useState(false);
 
-    // Exam Submisison State
+    // Exam Submission State
     const { studentName, setStudentName } = useAppContext();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showResults, setShowResults] = useState(false);
     const [finalScore, setFinalScore] = useState(0);
     const [totalPoints, setTotalPoints] = useState(0);
+    const [gradeDetails, setGradeDetails] = useState<Record<string, GradeResult>>({});
     const [showNameModal, setShowNameModal] = useState(false);
     const [nameInput, setNameInput] = useState("");
 
@@ -74,13 +75,36 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
 
     const handleRun = async () => {
         setIsRunning(true);
-        // Optimistic UI for output?
         setOutputs(prev => ({ ...prev, [currentQuestion.id]: "Running..." }));
 
         try {
-            // Append validation code if it exists to check correctness
-            const validationSuffix = currentQuestion.validationCode ? `\n\n${currentQuestion.validationCode}` : "";
-            const codeToRun = currentCode + validationSuffix;
+            let codeToRun: string;
+
+            if (currentQuestion.validationCode) {
+                // Wrap code to provide __STUDENT_CODE__ for validation
+                const studentCodeEscaped = currentCode
+                    .replace(/\\/g, '\\\\')
+                    .replace(/"""/g, '\\"\\"\\"');
+
+                codeToRun = `import ast
+import json
+
+# Student code as string for AST analysis
+__STUDENT_CODE__ = """${studentCodeEscaped}"""
+__exec_error__ = None
+
+# Execute student code
+try:
+    exec(__STUDENT_CODE__)
+except Exception as e:
+    __exec_error__ = str(e)
+
+# === VALIDATION ===
+${currentQuestion.validationCode}`;
+            } else {
+                // No validation - just run student code directly
+                codeToRun = currentCode;
+            }
 
             const result = await runCode(codeToRun);
             const output = (result.stdout || "") + (result.stderr || "");
@@ -113,44 +137,34 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
         if (!confirm("Are you sure you want to submit your exam? This cannot be undone.")) return;
 
         setIsSubmitting(true);
-        let calculatedScore = 0;
-        let examTotal = 0;
-
-        // Auto-scoring: Run validation for ALL questions
-        for (const q of exam.questions) {
-            examTotal += q.points;
-            const code = answers[q.id] || q.initialCode;
-            const contextCode = code + "\n\n" + (q.validationCode || "");
-
-            try {
-                const result = await runCode(contextCode);
-                // Simple grading: If no stderr (error), give full points
-                // In real world, we'd parse output more carefully or have specific PASS output
-                if (!result.stderr) {
-                    calculatedScore += q.points;
-                }
-            } catch (e) {
-                // Failed execution = 0 points for this question
-                console.error(`Error grading Q${q.id}`, e);
-            }
-        }
-
-        setFinalScore(calculatedScore);
-        setTotalPoints(examTotal);
 
         try {
-            await fetch('/api/exam/submit', {
+            // Server-side grading - send answers to API
+            const response = await fetch('/api/exam/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     examId: exam.id,
                     studentName,
-                    score: calculatedScore,
                     answers,
                     timeTakenSeconds: (exam.durationMinutes * 60) - timeLeft
                 })
             });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Submission failed');
+            }
+
+            // Update state with server response
+            setFinalScore(data.totalScore);
+            setTotalPoints(data.totalPoints);
+            if (data.data?.gradeDetails) {
+                setGradeDetails(data.data.gradeDetails);
+            }
             setShowResults(true);
+
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "Unknown error";
             alert("Failed to submit exam: " + message);
@@ -170,8 +184,8 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
 
     if (showResults) {
         return (
-            <div className="flex h-screen w-full items-center justify-center bg-[#0f0f16] text-white">
-                <div className="bg-[#1e1e2e] p-8 rounded-xl border border-[#27273a] text-center max-w-md w-full">
+            <div className="flex min-h-screen w-full items-center justify-center bg-[#0f0f16] text-white p-4">
+                <div className="bg-[#1e1e2e] p-8 rounded-xl border border-[#27273a] text-center max-w-2xl w-full">
                     <CheckCircle size={64} className="mx-auto text-green-500 mb-4" />
                     <h2 className="text-3xl font-bold mb-2">Exam Submitted!</h2>
                     <p className="text-gray-400 mb-6">Thank you, {studentName}.</p>
@@ -183,8 +197,36 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
                         </div>
                     </div>
 
+                    {/* Score Breakdown */}
+                    {Object.keys(gradeDetails).length > 0 && (
+                        <div className="bg-[#161622] p-4 rounded-lg mb-6 border border-[#27273a] text-left">
+                            <h3 className="text-sm text-gray-500 uppercase font-bold mb-3">Score Breakdown</h3>
+                            <div className="space-y-3">
+                                {exam.questions.map((q, idx) => {
+                                    const grade = gradeDetails[q.id];
+                                    if (!grade) return null;
+                                    const passed = grade.score === grade.maxScore;
+                                    return (
+                                        <div key={q.id} className="flex items-center justify-between p-3 bg-[#0f0f16] rounded-lg">
+                                            <div>
+                                                <span className="text-gray-400 text-sm">Q{idx + 1}:</span>
+                                                <span className="text-white ml-2 font-medium">{q.title}</span>
+                                            </div>
+                                            <div className={cn(
+                                                "font-bold px-3 py-1 rounded",
+                                                passed ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                                            )}>
+                                                {grade.score} / {grade.maxScore}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+
                     <p className="text-sm text-gray-400 mb-6">
-                        Your results have been recorded. You may close this tab returning to the dashboard.
+                        Your results have been recorded. You may close this tab or return to the dashboard.
                     </p>
 
                     <button
@@ -275,6 +317,16 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
                                 <h4 className="text-blue-400 font-bold text-sm uppercase mb-2">Points</h4>
                                 <span className="text-2xl font-bold text-white">{currentQuestion.points}</span>
                             </div>
+
+                            {/* Hints Section */}
+                            {currentQuestion.hints && (
+                                <div className="bg-yellow-900/10 border border-yellow-500/20 p-4 rounded-lg mt-4">
+                                    <h4 className="text-yellow-400 font-bold text-sm uppercase mb-2 flex items-center gap-2">
+                                        <Lightbulb size={16} /> Hints
+                                    </h4>
+                                    <p className="text-gray-300 text-sm whitespace-pre-wrap">{currentQuestion.hints}</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
