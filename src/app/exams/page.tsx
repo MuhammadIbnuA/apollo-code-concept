@@ -15,7 +15,7 @@ export default function ExamListPage() {
             .then(data => {
                 if (Array.isArray(data)) {
                     // Client-side filtering for public exams
-                    setExams(data.filter((e: any) => e.isPublic));
+                    setExams(data.filter((e: Exam) => e.isPublic));
                 }
                 setLoading(false);
             })

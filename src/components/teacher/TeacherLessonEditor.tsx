@@ -172,7 +172,7 @@ export default function TeacherLessonEditor({ lessonId }: TeacherLessonEditorPro
                                 <select
                                     className="w-full bg-black/40 border border-gray-700 rounded p-3 text-white text-sm focus:border-primary outline-none"
                                     value={form.validationType || 'output'}
-                                    onChange={e => setForm({ ...form, validationType: e.target.value as any })}
+                                    onChange={e => setForm({ ...form, validationType: e.target.value as 'output' | 'code' })}
                                 >
                                     <option value="output">Expected Output</option>
                                     <option value="code">Hidden Validation Code</option>

@@ -34,12 +34,12 @@ export async function POST(request: NextRequest) {
         const data = await response.json();
         return NextResponse.json(data);
 
-    } catch (error: any) {
-        console.error("[Proxy] Network Error:", error.message);
-        if (error.cause) console.error("Cause:", error.cause);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        console.error("[Proxy] Network Error:", message);
 
         return NextResponse.json(
-            { error: "Failed to submit code", details: error.message },
+            { error: "Failed to submit code", details: message },
             { status: 500 }
         );
     }

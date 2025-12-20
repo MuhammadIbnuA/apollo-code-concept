@@ -31,7 +31,7 @@ export default function ExamEditor({ id }: ExamEditorProps) {
         if (!isNew) {
             fetch('/api/admin/exams')
                 .then(res => res.json())
-                .then((exams: any[]) => {
+                .then((exams: Exam[]) => {
                     const found = exams.find(e => e.id === id);
                     if (found) setExam(found);
                     setLoading(false);
@@ -51,9 +51,8 @@ export default function ExamEditor({ id }: ExamEditorProps) {
         setExam(prev => ({ ...prev, questions: [...prev.questions, newQ] }));
     };
 
-    const updateQuestion = (idx: number, field: string, value: any) => {
+    const updateQuestion = (idx: number, field: keyof Question, value: string | number) => {
         const newQuestions = [...exam.questions];
-        // @ts-ignore
         newQuestions[idx] = { ...newQuestions[idx], [field]: value };
         setExam(prev => ({ ...prev, questions: newQuestions }));
     };
@@ -87,8 +86,9 @@ export default function ExamEditor({ id }: ExamEditorProps) {
                 const err = await res.json();
                 alert("Error: " + err.error);
             }
-        } catch (e: any) {
-            alert("Error: " + e.message);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : "Unknown error";
+            alert("Error: " + message);
         } finally {
             setSaving(false);
         }
@@ -172,7 +172,7 @@ export default function ExamEditor({ id }: ExamEditorProps) {
                 </div>
 
                 <div className="space-y-6">
-                    {exam.questions.map((q: any, idx: number) => (
+                    {exam.questions.map((q: Question, idx: number) => (
                         <div key={idx} className="bg-[#1e1e2e] rounded-lg border border-[#27273a] overflow-hidden">
                             <div className="bg-[#27273a] p-4 flex justify-between items-center">
                                 <h3 className="font-bold text-gray-200">Question {idx + 1}</h3>
@@ -217,7 +217,7 @@ export default function ExamEditor({ id }: ExamEditorProps) {
                                         <div className="flex-1 relative">
                                             <CodeEditor
                                                 initialValue={q.initialCode}
-                                                onChange={v => updateQuestion(idx, 'initialCode', v)}
+                                                onChange={v => updateQuestion(idx, 'initialCode', v || '')}
                                                 language="python"
                                             />
                                         </div>
@@ -227,7 +227,7 @@ export default function ExamEditor({ id }: ExamEditorProps) {
                                         <div className="flex-1 relative">
                                             <CodeEditor
                                                 initialValue={q.validationCode || ""}
-                                                onChange={v => updateQuestion(idx, 'validationCode', v)}
+                                                onChange={v => updateQuestion(idx, 'validationCode', v || '')}
                                                 language="python"
                                             />
                                         </div>

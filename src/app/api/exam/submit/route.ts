@@ -28,7 +28,7 @@ export async function POST(req: Request) {
         });
 
         // Calculate total possible points for response context
-        const totalPoints = exam.questions.reduce((sum: number, q: any) => sum + (q.points || 0), 0);
+        const totalPoints = exam.questions.reduce((sum: number, q: { points?: number }) => sum + (q.points || 0), 0);
         const passed = score >= (totalPoints * 0.6); // Simple 60% pass threshold example
 
         return NextResponse.json({
@@ -39,12 +39,12 @@ export async function POST(req: Request) {
             passed
         });
 
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error("Submit error:", e);
+        const message = e instanceof Error ? e.message : "Unknown error";
         return NextResponse.json({
             error: "Internal Server Error",
-            details: e.message,
-            stack: e.stack
+            details: message
         }, { status: 500 });
     }
 }

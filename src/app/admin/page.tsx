@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Exam } from "@/lib/db";
-import { Plus, Edit, Trash } from "lucide-react";
+import { Plus, Edit } from "lucide-react";
 
 export default function AdminDashboard() {
     const [exams, setExams] = useState<Exam[]>([]);

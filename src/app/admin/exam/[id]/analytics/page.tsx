@@ -141,7 +141,7 @@ export default function AnalyticsPage({ params }: PageProps) {
                         <div className="bg-[#1e1e2e] w-full max-w-4xl h-[80vh] rounded-xl border border-[#27273a] flex flex-col shadow-2xl">
                             <div className="p-4 border-b border-[#27273a] flex justify-between items-center">
                                 <div>
-                                    <h3 className="font-bold text-lg">{selectedSubmission.studentName}'s Submission</h3>
+                                    <h3 className="font-bold text-lg">{selectedSubmission.studentName}&apos;s Submission</h3>
                                     <p className="text-gray-400 text-sm">Score: {selectedSubmission.score}</p>
                                 </div>
                                 <button onClick={() => setSelectedSubmission(null)} className="p-2 hover:bg-white/10 rounded">X</button>
@@ -169,7 +169,7 @@ export default function AnalyticsPage({ params }: PageProps) {
     );
 }
 
-function KpiCard({ title, value, icon, desc }: { title: string, value: string | number, icon: any, desc: string }) {
+function KpiCard({ title, value, icon, desc }: { title: string, value: string | number, icon: React.ReactNode, desc: string }) {
     return (
         <div className="bg-[#1e1e2e] p-4 rounded-xl border border-[#27273a] flex flex-col items-center text-center hover:border-blue-500/30 transition-all">
             <div className="mb-2 p-2 bg-[#161622] rounded-full border border-[#27273a]">{icon}</div>

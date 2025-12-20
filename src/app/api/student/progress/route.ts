@@ -22,7 +22,7 @@ export async function GET(request: Request) {
             points,
             completedLessons
         });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to fetch progress' }, { status: 500 });
     }
 }

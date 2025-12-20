@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Exam, Question } from "@/data/exams";
+import { Exam } from "@/lib/db";
 import dynamic from "next/dynamic";
 import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, Save } from "lucide-react";
 import { runCode } from "@/lib/judge0";
@@ -96,8 +96,9 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
             }
 
             setOutputs(prev => ({ ...prev, [currentQuestion.id]: output + statusMessage || "(No output)" }));
-        } catch (e: any) {
-            setOutputs(prev => ({ ...prev, [currentQuestion.id]: "Error: " + e.message }));
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : "Unknown error";
+            setOutputs(prev => ({ ...prev, [currentQuestion.id]: "Error: " + message }));
         } finally {
             setIsRunning(false);
         }
@@ -150,8 +151,9 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
                 })
             });
             setShowResults(true);
-        } catch (e: any) {
-            alert("Failed to submit exam: " + e.message);
+        } catch (e: unknown) {
+            const message = e instanceof Error ? e.message : "Unknown error";
+            alert("Failed to submit exam: " + message);
         } finally {
             setIsSubmitting(false);
         }

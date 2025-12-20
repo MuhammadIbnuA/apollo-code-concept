@@ -18,8 +18,9 @@ export async function GET(request: Request) {
 
         const analytics = await db.getExamAnalytics(examId);
         return NextResponse.json(analytics);
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error("Analytics Error:", e);
-        return NextResponse.json({ error: e.message || 'Failed to fetch analytics' }, { status: 500 });
+        const message = e instanceof Error ? e.message : "Failed to fetch analytics";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

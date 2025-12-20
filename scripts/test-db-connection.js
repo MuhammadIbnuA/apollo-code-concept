@@ -1,7 +1,13 @@
 
+require('dotenv').config();
 const { Pool } = require('pg');
 
 let DATABASE_URL = process.env.DATABASE_URL;
+
+if (!DATABASE_URL) {
+    console.error("❌ DATABASE_URL is not set in .env file");
+    process.exit(1);
+}
 
 // Remove sslmode from string to prevent conflicts, we will set it manually in config
 DATABASE_URL = DATABASE_URL.replace('?sslmode=require', '').replace('&sslmode=require', '');

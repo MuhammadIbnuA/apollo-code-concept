@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { db, SharedLesson } from '@/lib/db';
+import { db, Lesson } from '@/lib/db';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: Request) {
@@ -8,7 +8,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { title, description, task, content, initialCode, expectedOutput, validationCode, validationType } = body;
 
-        const newLesson: SharedLesson = {
+        const newLesson: Lesson = {
             id: uuidv4(),
             title: title || "Untitled Task",
             description: description || "",
@@ -18,6 +18,7 @@ export async function POST(request: Request) {
             expectedOutput: expectedOutput,
             validationCode: validationCode,
             validationType: validationType || 'output',
+            isPublic: false,
             createdAt: new Date().toISOString()
         };
 

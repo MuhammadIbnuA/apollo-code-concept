@@ -7,7 +7,7 @@ import { useAppContext } from "@/context/AppContext";
 import { Lesson } from "@/lib/db";
 
 export default function StudentDashboard() {
-    const { studentName, setStudentName, points, completedLessons, refreshProgress } = useAppContext();
+    const { studentName, setStudentName, points, completedLessons } = useAppContext();
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const [nameInput, setNameInput] = useState("");
     const [showNameModal, setShowNameModal] = useState(false);
@@ -23,7 +23,7 @@ export default function StudentDashboard() {
             .then(async (res) => {
                 const data = await res.json();
                 if (Array.isArray(data)) {
-                    setLessons(data.filter((l: any) => l.isPublic));
+                    setLessons(data.filter((l: Lesson) => l.isPublic));
                 } else {
                     console.error("Failed to load lessons:", data);
                     setLessons([]);

@@ -1,7 +1,7 @@
 
 import ClientOnly from "@/components/ClientOnly";
 import LessonView from "@/components/LessonView";
-import { notFound } from "next/navigation";
+import { Lesson } from "@/lib/db";
 
 // Since we can't do DB calls directly in server component neatly without being async
 // and we want to reuse LessonView which is client, let's fetch in a server component wrapper
@@ -13,7 +13,7 @@ async function getSharedLesson(id: string) {
         // But we put DB logic in lib/db which uses 'fs', so it works on server only.
         const { db } = await import("@/lib/db");
         return db.getLesson(id);
-    } catch (e) {
+    } catch {
         return null;
     }
 }
@@ -37,7 +37,7 @@ export default async function SharedLessonPage({ params }: PageProps) {
 
     return (
         <ClientOnly>
-            <LessonView lesson={lesson as any} isShared={true} />
+            <LessonView lesson={lesson as Lesson} isShared={true} />
         </ClientOnly>
     );
 }

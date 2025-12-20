@@ -37,11 +37,12 @@ export async function GET(
         const data = await response.json();
         return NextResponse.json(data);
 
-    } catch (error: any) {
-        console.error("[Proxy] Status Network Error:", error.message);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        console.error("[Proxy] Status Network Error:", message);
 
         return NextResponse.json(
-            { error: "Failed to fetch status", details: error.message },
+            { error: "Failed to fetch status", details: message },
             { status: 500 }
         );
     }

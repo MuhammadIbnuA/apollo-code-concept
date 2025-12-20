@@ -3,10 +3,17 @@
 import React, { useState, useEffect } from "react";
 import { BarChart2, BookOpen, Users } from "lucide-react";
 
+interface Submission {
+    studentName: string;
+    lessonId: string;
+    status: string;
+    timestamp: string;
+}
+
 interface DashboardStats {
     totalSubmissions: number;
     totalStudents: number; // Derived from unique names in submissions
-    recentActivity: any[];
+    recentActivity: Submission[];
 }
 
 export default function TeacherDashboard() {
@@ -17,7 +24,7 @@ export default function TeacherDashboard() {
         fetch('/api/teacher/analytics')
             .then(res => res.json())
             .then(data => {
-                const uniqueStudents = new Set(data.submissions.map((s: any) => s.studentName)).size;
+                const uniqueStudents = new Set(data.submissions.map((s: Submission) => s.studentName)).size;
                 setStats({
                     totalSubmissions: data.total,
                     totalStudents: uniqueStudents,

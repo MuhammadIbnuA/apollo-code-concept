@@ -25,8 +25,7 @@ export default function StudentWorkspace({ lesson, allLessons = [] }: StudentWor
         setStudentName,
         points,
         completedLessons,
-        submitAttempt,
-        refreshProgress
+        submitAttempt
     } = useAppContext();
 
     const [code, setCode] = useState(lesson.initialCode);
@@ -70,7 +69,7 @@ export default function StudentWorkspace({ lesson, allLessons = [] }: StudentWor
             if (!rawOutput) rawOutput = "(No output generated)";
 
             // 3. Validate
-            let newStatus: "success" | "wrong_answer" | "error" = "idle" as any;
+            let newStatus: "success" | "wrong_answer" | "error" = "error";
 
             if (lesson.validationType === 'code') {
                 // If custom code, stderr usually means assertion failed
@@ -99,9 +98,10 @@ export default function StudentWorkspace({ lesson, allLessons = [] }: StudentWor
                 // Progress is auto-refreshed by context
             }
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            setOutput("⚠️ Execution Error:\n" + (error.message || "Unknown error"));
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            setOutput("⚠️ Execution Error:\n" + errorMessage);
             setStatus("error");
         } finally {
             setIsRunning(false);
