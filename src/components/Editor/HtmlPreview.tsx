@@ -216,15 +216,39 @@ export default function HtmlPreview({
                 </div>
             </div>
 
-            {/* Preview using srcdoc */}
+            {/* Preview using srcdoc - fully isolated */}
             {showPreview && (
                 <div className="flex-1 bg-white">
                     <iframe
                         ref={iframeRef}
                         title="HTML Preview"
                         className="w-full h-full border-0"
-                        srcDoc={code}
-                        sandbox="allow-scripts allow-same-origin"
+                        srcDoc={`
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <base target="_self">
+                                <script>
+                                    // Prevent hash changes from affecting parent
+                                    (function() {
+                                        // Override location to stay within iframe
+                                        var originalHash = window.location.hash;
+                                        Object.defineProperty(window.location, 'hash', {
+                                            get: function() { return originalHash; },
+                                            set: function(v) { 
+                                                originalHash = v;
+                                                window.dispatchEvent(new HashChangeEvent('hashchange'));
+                                            }
+                                        });
+                                    })();
+                                </script>
+                            </head>
+                            <body>
+                                ${code.replace(/<!DOCTYPE html>|<\/?html>|<\/?head>|<\/?body>/gi, '')}
+                            </body>
+                            </html>
+                        `}
+                        sandbox="allow-scripts"
                     />
                 </div>
             )}
@@ -232,8 +256,8 @@ export default function HtmlPreview({
             {/* Validation Result */}
             {validationStatus !== 'pending' && (
                 <div className={`p-3 border-t ${validationStatus === 'passed'
-                        ? 'bg-green-900/50 border-green-700'
-                        : 'bg-red-900/50 border-red-700'
+                    ? 'bg-green-900/50 border-green-700'
+                    : 'bg-red-900/50 border-red-700'
                     }`}>
                     <div className="flex items-center gap-2 mb-2">
                         {validationStatus === 'passed' ? (
