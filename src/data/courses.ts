@@ -1042,6 +1042,321 @@ const cardStyle = {
         createdAt: new Date().toISOString(),
         courseId: 'react',
         language: 'react'
+    },
+    {
+        id: 'react-06-useeffect',
+        title: 'useEffect & Fetching Data',
+        description: 'Menggunakan useEffect untuk fetch data dari API',
+        task: 'Buat komponen yang fetch dan tampilkan data user',
+        content: `# useEffect Hook
+
+useEffect digunakan untuk side effects seperti fetch data.
+
+## Syntax
+
+\`\`\`jsx
+useEffect(() => {
+    // Side effect code
+    fetchData();
+}, [dependencies]);
+\`\`\`
+
+## Fetch Data Pattern
+
+\`\`\`jsx
+const [data, setData] = useState(null);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+    fetch('https://api.example.com/data')
+        .then(res => res.json())
+        .then(data => {
+            setData(data);
+            setLoading(false);
+        });
+}, []);
+\`\`\``,
+        initialCode: `<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .card { padding: 16px; border: 1px solid #ddd; border-radius: 8px; margin: 8px; }
+        .loading { color: gray; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        function UserCard() {
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(true);
+            
+            useEffect(() => {
+                // Fetch user dari JSONPlaceholder API
+                fetch('https://jsonplaceholder.typicode.com/users/1')
+                    .then(res => res.json())
+                    .then(data => {
+                        setUser(data);
+                        setLoading(false);
+                    });
+            }, []);
+            
+            if (loading) return <div className="loading">Loading...</div>;
+            
+            return (
+                <div className="card">
+                    <h2>{user.name}</h2>
+                    <p>Email: {user.email}</p>
+                    <p>Phone: {user.phone}</p>
+                </div>
+            );
+        }
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<UserCard />);
+    </script>
+</body>
+</html>`,
+        validationCode: `div|h2|p:Email`,
+        validationType: 'html',
+        isPublic: true,
+        createdAt: new Date().toISOString(),
+        courseId: 'react',
+        language: 'react'
+    },
+    {
+        id: 'react-07-router',
+        title: 'React Router (Simulasi)',
+        description: 'Navigasi antar halaman dengan React Router pattern',
+        task: 'Buat mini SPA dengan navigasi Home, About, Contact',
+        content: `# React Router
+
+React Router memungkinkan navigasi tanpa refresh halaman.
+
+## Hash-based Routing (Simple)
+
+\`\`\`jsx
+// Menggunakan window.location.hash
+const [page, setPage] = useState('home');
+
+useEffect(() => {
+    const handleHash = () => {
+        setPage(window.location.hash.slice(1) || 'home');
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+}, []);
+\`\`\`
+
+## Navigation
+\`\`\`jsx
+<a href="#home">Home</a>
+<a href="#about">About</a>
+\`\`\`
+
+## Render Berdasarkan Route
+\`\`\`jsx
+{page === 'home' && <HomePage />}
+{page === 'about' && <AboutPage />}
+\`\`\``,
+        initialCode: `<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: sans-serif; }
+        nav { background: #333; padding: 16px; }
+        nav a { color: white; margin-right: 16px; text-decoration: none; }
+        nav a:hover { text-decoration: underline; }
+        nav a.active { color: #4af; }
+        .page { padding: 32px; }
+        h1 { margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Pages
+        function HomePage() {
+            return (
+                <div className="page">
+                    <h1>🏠 Home</h1>
+                    <p>Selamat datang di halaman utama!</p>
+                </div>
+            );
+        }
+        
+        function AboutPage() {
+            return (
+                <div className="page">
+                    <h1>ℹ️ About</h1>
+                    <p>Ini adalah halaman tentang kami.</p>
+                </div>
+            );
+        }
+        
+        function ContactPage() {
+            return (
+                <div className="page">
+                    <h1>📞 Contact</h1>
+                    <p>Hubungi kami di contact@example.com</p>
+                </div>
+            );
+        }
+        
+        function App() {
+            const [page, setPage] = useState('home');
+            
+            // Listen to hash changes
+            useEffect(() => {
+                const handleHash = () => {
+                    const hash = window.location.hash.slice(1) || 'home';
+                    setPage(hash);
+                };
+                handleHash(); // Initial
+                window.addEventListener('hashchange', handleHash);
+                return () => window.removeEventListener('hashchange', handleHash);
+            }, []);
+            
+            return (
+                <div>
+                    <nav>
+                        <a href="#home" className={page === 'home' ? 'active' : ''}>Home</a>
+                        <a href="#about" className={page === 'about' ? 'active' : ''}>About</a>
+                        <a href="#contact" className={page === 'contact' ? 'active' : ''}>Contact</a>
+                    </nav>
+                    
+                    {page === 'home' && <HomePage />}
+                    {page === 'about' && <AboutPage />}
+                    {page === 'contact' && <ContactPage />}
+                </div>
+            );
+        }
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>`,
+        validationCode: `nav|a:Home|a:About|a:Contact|div`,
+        validationType: 'html',
+        isPublic: true,
+        createdAt: new Date().toISOString(),
+        courseId: 'react',
+        language: 'react'
+    },
+    {
+        id: 'react-08-tailwind',
+        title: 'React + Tailwind CSS',
+        description: 'Menggunakan Tailwind CSS dalam komponen React',
+        task: 'Buat komponen Button dan Card dengan Tailwind styling',
+        content: `# React + Tailwind
+
+Tailwind CSS sangat cocok dengan React karena utility classes.
+
+## Button Component
+
+\`\`\`jsx
+function Button({ children, variant = 'primary' }) {
+    const base = 'px-4 py-2 rounded font-semibold';
+    const variants = {
+        primary: 'bg-blue-500 text-white hover:bg-blue-600',
+        secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+    };
+    return (
+        <button className={\`\${base} \${variants[variant]}\`}>
+            {children}
+        </button>
+    );
+}
+\`\`\`
+
+## Conditional Classes
+
+\`\`\`jsx
+<div className={\`\${isActive ? 'bg-green-500' : 'bg-gray-500'}\`}>
+\`\`\``,
+        initialCode: `<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        // Button Component
+        function Button({ children, variant = 'primary', onClick }) {
+            const base = 'px-4 py-2 rounded-lg font-semibold transition-colors';
+            const variants = {
+                primary: 'bg-blue-500 text-white hover:bg-blue-600',
+                secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
+                danger: 'bg-red-500 text-white hover:bg-red-600',
+            };
+            return (
+                <button className={\`\${base} \${variants[variant]}\`} onClick={onClick}>
+                    {children}
+                </button>
+            );
+        }
+        
+        // Card Component
+        function Card({ title, children }) {
+            return (
+                <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">{title}</h3>
+                    <div className="text-gray-600">{children}</div>
+                </div>
+            );
+        }
+        
+        // App
+        function App() {
+            const [count, setCount] = React.useState(0);
+            
+            return (
+                <div className="space-y-4">
+                    <Card title="React + Tailwind">
+                        <p className="mb-4">Counter: {count}</p>
+                        <div className="flex gap-2">
+                            <Button variant="primary" onClick={() => setCount(count + 1)}>
+                                +1
+                            </Button>
+                            <Button variant="secondary" onClick={() => setCount(0)}>
+                                Reset
+                            </Button>
+                            <Button variant="danger" onClick={() => setCount(count - 1)}>
+                                -1
+                            </Button>
+                        </div>
+                    </Card>
+                </div>
+            );
+        }
+        
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>`,
+        validationCode: `button|div[class]`,
+        validationType: 'html',
+        isPublic: true,
+        createdAt: new Date().toISOString(),
+        courseId: 'react',
+        language: 'react'
     }
 ];
 
