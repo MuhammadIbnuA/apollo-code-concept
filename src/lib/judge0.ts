@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// Use internal proxy to avoid CORS
-const API_URL = "/api/judge0";
+// Use backend server for Judge0 proxy
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/judge0`;
 
 export interface ExecutionResult {
     stdout: string | null;
