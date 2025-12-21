@@ -2,18 +2,27 @@
  * Database Keep-Alive API Route
  * Pings the database every minute to prevent it from sleeping
  * 
- * This is called by Vercel Cron or external cron services
+ * This is called by external cron services like cron-job.org
  * GET /api/cron/keep-alive
  */
 
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { Pool } from 'pg';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// Vercel Cron configuration
-export const runtime = 'nodejs';
+// Create a simple pool for ping
+function createPool() {
+    const dbUrl = process.env.DATABASE_URL;
+    if (!dbUrl) return null;
+
+    return new Pool({
+        connectionString: dbUrl,
+        ssl: { rejectUnauthorized: false },
+        connectionTimeoutMillis: 5000
+    });
+}
 
 export async function GET(request: Request) {
     // Verify cron secret in production (optional security)
@@ -26,14 +35,25 @@ export async function GET(request: Request) {
     }
 
     const startTime = Date.now();
+    const pool = createPool();
+
+    if (!pool) {
+        return NextResponse.json({
+            status: 'error',
+            message: 'DATABASE_URL not configured',
+            timestamp: new Date().toISOString()
+        }, { status: 500 });
+    }
 
     try {
         // Simple query to keep database connection alive
-        const result = await db.query('SELECT NOW() as current_time, 1 as ping');
+        const result = await pool.query('SELECT NOW() as current_time, 1 as ping');
         const dbTime = result.rows[0]?.current_time;
         const responseTime = Date.now() - startTime;
 
         console.log(`[Keep-Alive] Database pinged successfully at ${dbTime} (${responseTime}ms)`);
+
+        await pool.end();
 
         return NextResponse.json({
             status: 'ok',
@@ -44,6 +64,8 @@ export async function GET(request: Request) {
         });
     } catch (error) {
         console.error('[Keep-Alive] Database ping failed:', error);
+
+        try { await pool.end(); } catch { }
 
         return NextResponse.json({
             status: 'error',
