@@ -1,6 +1,7 @@
 
-import StudentDashboard from "@/components/student/StudentDashboard";
+import { redirect } from 'next/navigation';
 
 export default function LearnPage() {
-    return <StudentDashboard />;
+    // Redirect to course selection page
+    redirect('/courses');
 }

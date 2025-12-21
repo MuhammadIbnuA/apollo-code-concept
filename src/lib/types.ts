@@ -43,6 +43,19 @@ export interface ExamSubmission {
     timestamp: string;
 }
 
+// Course language types
+export type CourseLanguage = 'python' | 'html' | 'css' | 'html-css' | 'javascript' | 'react' | 'tailwind';
+
+export interface Course {
+    id: string;
+    title: string;
+    description: string;
+    language: CourseLanguage;
+    icon: string;
+    color: string;
+    lessonCount?: number;
+}
+
 export interface Lesson {
     id: string;
     title: string;
@@ -52,9 +65,12 @@ export interface Lesson {
     initialCode: string;
     expectedOutput?: string;
     validationCode?: string;
-    validationType: 'output' | 'code';
+    validationType: 'output' | 'code' | 'html' | 'css';
     isPublic: boolean;
     createdAt: string;
+    // Multi-language support
+    courseId?: string;
+    language?: CourseLanguage;
 }
 
 export interface Submission {
