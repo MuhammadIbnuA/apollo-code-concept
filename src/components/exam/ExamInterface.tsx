@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Exam, GradeResult } from "@/lib/types";
 import dynamic from "next/dynamic";
-import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, Save, Lightbulb } from "lucide-react";
+import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, Save, Lightbulb, Shield, AlertTriangle, X, Monitor, Eye } from "lucide-react";
 import { runCode } from "@/lib/judge0";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/AppContext";
+import { useExamSecurity, Violation } from "@/hooks/useExamSecurity";
 
 // Reuse the SSR-safe Editor Wrapper? Or just dynamic import here. 
 // Let's use dynamic import here to be safe and explicit.
@@ -36,9 +37,58 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
     const [showNameModal, setShowNameModal] = useState(false);
     const [nameInput, setNameInput] = useState("");
 
+    // Security State
+    const [showSecurityModal, setShowSecurityModal] = useState(true);
+    const [securityWarning, setSecurityWarning] = useState("");
+    const [showWarning, setShowWarning] = useState(false);
+    const MAX_VIOLATIONS = 5;
+
     const currentQuestion = exam.questions[currentQuestionIndex];
     const currentCode = answers[currentQuestion.id] || currentQuestion.initialCode;
     const currentOutput = outputs[currentQuestion.id] || "";
+
+    // Handle security violations
+    const handleSecurityViolation = useCallback((violation: Violation) => {
+        const messages: Record<string, string> = {
+            fullscreen_exit: `⚠️ Keluar fullscreen! (${violation.count}/3)`,
+            tab_switch: `⚠️ Perpindahan tab terdeteksi!`,
+            window_blur: `⚠️ Window tidak fokus!`,
+            copy_attempt: `⚠️ Copy tidak diizinkan!`,
+            paste_attempt: `⚠️ Paste tidak diizinkan!`,
+            devtools: `⚠️ DevTools tidak diizinkan!`,
+            right_click: `⚠️ Klik kanan dinonaktifkan!`,
+            print_screen: `⚠️ Screenshot terdeteksi!`,
+            refresh: `⚠️ Refresh terdeteksi!`,
+        };
+
+        setSecurityWarning(messages[violation.type] || 'Pelanggaran terdeteksi!');
+        setShowWarning(true);
+        setTimeout(() => setShowWarning(false), 3000);
+
+        console.log('[Security] Violation:', violation);
+    }, []);
+
+    // Exam security hook
+    const {
+        isFullscreen,
+        violations,
+        totalViolations,
+        deviceFingerprint,
+        requestFullscreen,
+    } = useExamSecurity({
+        enableFullscreen: !showSecurityModal, // Only enable after user starts
+        maxFullscreenExits: 3,
+        enableCopyPasteBlock: !showSecurityModal,
+        enableRightClickBlock: !showSecurityModal,
+        enableTabDetection: !showSecurityModal,
+        onViolation: handleSecurityViolation,
+        onAutoSubmit: () => {
+            // Auto submit on max violations
+            if (totalViolations >= MAX_VIOLATIONS) {
+                handleSubmit();
+            }
+        },
+    });
 
     // Show name modal on first load if no student name
     useEffect(() => {
@@ -248,7 +298,123 @@ ${currentQuestion.validationCode}`;
     }
 
     return (
-        <div className="flex h-screen w-full bg-[#0f0f16] text-white font-sans overflow-hidden">
+        <div className="flex h-screen w-full bg-[#0f0f16] text-white font-sans overflow-hidden relative">
+            {/* Security Start Modal */}
+            {showSecurityModal && (
+                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+                    <div className="bg-[#1e1e2e] rounded-xl p-8 max-w-lg mx-4 shadow-2xl border border-[#27273a]">
+                        <div className="text-center mb-6">
+                            <Shield className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold text-white mb-2">
+                                Peraturan Ujian Online
+                            </h2>
+                            <p className="text-gray-400">
+                                Mohon baca dan pahami peraturan berikut
+                            </p>
+                        </div>
+
+                        <div className="space-y-3 mb-6 text-sm">
+                            <div className="flex items-start gap-3 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                                <Monitor className="w-5 h-5 text-blue-400 mt-0.5" />
+                                <div>
+                                    <p className="font-medium text-white">Mode Fullscreen Wajib</p>
+                                    <p className="text-gray-400">Keluar fullscreen akan dicatat sebagai pelanggaran.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                                <Eye className="w-5 h-5 text-yellow-400 mt-0.5" />
+                                <div>
+                                    <p className="font-medium text-white">Aktivitas Dimonitor</p>
+                                    <p className="text-gray-400">Tab switch, copy/paste, dan aktivitas mencurigakan tercatat.</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+                                <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5" />
+                                <div>
+                                    <p className="font-medium text-white">Batas Pelanggaran: {MAX_VIOLATIONS}x</p>
+                                    <p className="text-gray-400">Lebih dari itu ujian otomatis disubmit.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="text-center">
+                            <button
+                                onClick={async () => {
+                                    const success = await requestFullscreen();
+                                    if (success) {
+                                        setShowSecurityModal(false);
+                                    } else {
+                                        alert('Tidak dapat masuk fullscreen. Browser mungkin tidak mendukung.');
+                                    }
+                                }}
+                                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-lg"
+                            >
+                                🚀 Mulai Ujian
+                            </button>
+                            <p className="text-xs text-gray-500 mt-3">
+                                Dengan menekan tombol di atas, Anda menyetujui peraturan ujian
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Warning Overlay */}
+            {showWarning && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-pulse">
+                    <div className="bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3">
+                        <AlertTriangle className="w-5 h-5" />
+                        <span className="font-medium">{securityWarning}</span>
+                        <button onClick={() => setShowWarning(false)}>
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Fullscreen Exit Prompt */}
+            {!isFullscreen && !showSecurityModal && !showResults && (
+                <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50">
+                    <div className="bg-[#1e1e2e] rounded-xl p-8 max-w-md mx-4 text-center border border-[#27273a]">
+                        <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                        <h2 className="text-xl font-bold text-white mb-2">
+                            Mode Fullscreen Required
+                        </h2>
+                        <p className="text-gray-400 mb-4">
+                            Anda telah keluar dari fullscreen.
+                        </p>
+                        <p className="text-red-400 text-sm mb-6">
+                            Pelanggaran: {violations.filter(v => v.type === 'fullscreen_exit').length}/3
+                        </p>
+                        <button
+                            onClick={requestFullscreen}
+                            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors"
+                        >
+                            Kembali ke Fullscreen
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Security Status Indicator */}
+            {!showSecurityModal && (
+                <div className="fixed top-4 right-4 z-40">
+                    <div className={cn(
+                        "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium",
+                        totalViolations === 0
+                            ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                            : totalViolations < MAX_VIOLATIONS / 2
+                                ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                                : "bg-red-500/20 text-red-400 border border-red-500/30"
+                    )}>
+                        <Shield className="w-4 h-4" />
+                        <span>Pelanggaran: {totalViolations}/{MAX_VIOLATIONS}</span>
+                    </div>
+                </div>
+            )}
+
             {/* Sidebar Navigation (Questions) */}
             <div className="w-64 border-r border-[#27273a] bg-[#161622] flex flex-col">
                 <div className="p-4 border-b border-[#27273a]">
