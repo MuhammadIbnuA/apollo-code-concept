@@ -82,13 +82,17 @@ export default function ExamInterface({ exam }: ExamInterfaceProps) {
         enableRightClickBlock: !showSecurityModal,
         enableTabDetection: !showSecurityModal,
         onViolation: handleSecurityViolation,
-        onAutoSubmit: () => {
-            // Auto submit on max violations
-            if (totalViolations >= MAX_VIOLATIONS) {
-                handleSubmit();
-            }
-        },
     });
+
+    // State for force auto-submit
+    const [shouldForceSubmit, setShouldForceSubmit] = useState(false);
+
+    // Auto-submit when max violations reached
+    useEffect(() => {
+        if (totalViolations >= MAX_VIOLATIONS && !showResults && !isSubmitting) {
+            setShouldForceSubmit(true);
+        }
+    }, [totalViolations, showResults, isSubmitting]);
 
     // Show name modal on first load if no student name
     useEffect(() => {
@@ -185,13 +189,14 @@ ${currentQuestion.validationCode}`;
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (forceSubmit: boolean = false) => {
         if (!studentName) {
             setShowNameModal(true);
             return;
         }
 
-        if (!confirm("Are you sure you want to submit your exam? This cannot be undone.")) return;
+        // Skip confirm dialog if force submit (auto-submit from violations)
+        if (!forceSubmit && !confirm("Are you sure you want to submit your exam? This cannot be undone.")) return;
 
         setIsSubmitting(true);
 
@@ -229,6 +234,14 @@ ${currentQuestion.validationCode}`;
             setIsSubmitting(false);
         }
     };
+
+    // Effect to handle force auto-submit when max violations reached
+    useEffect(() => {
+        if (shouldForceSubmit && !isSubmitting && !showResults) {
+            handleSubmit(true);
+            setShouldForceSubmit(false);
+        }
+    }, [shouldForceSubmit, isSubmitting, showResults]);
 
     const handleLogin = () => {
         if (nameInput.trim()) {
@@ -445,7 +458,7 @@ ${currentQuestion.validationCode}`;
 
                 <div className="p-4 border-t border-[#27273a]">
                     <button
-                        onClick={handleSubmit}
+                        onClick={() => handleSubmit(false)}
                         disabled={isSubmitting}
                         className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                     >
