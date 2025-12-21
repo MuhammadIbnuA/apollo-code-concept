@@ -12,15 +12,25 @@ import { Pool } from 'pg';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// Create a simple pool for ping
+// Create a simple pool for ping with proper SSL config
 function createPool() {
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) return null;
 
+    // Remove sslmode from URL to avoid conflicts
+    let cleanUrl = dbUrl;
+    try {
+        const url = new URL(dbUrl);
+        url.searchParams.delete('sslmode');
+        cleanUrl = url.toString();
+    } catch { }
+
     return new Pool({
-        connectionString: dbUrl,
-        ssl: { rejectUnauthorized: false },
-        connectionTimeoutMillis: 5000
+        connectionString: cleanUrl,
+        ssl: {
+            rejectUnauthorized: false  // Allow self-signed certs
+        },
+        connectionTimeoutMillis: 10000
     });
 }
 
@@ -51,7 +61,7 @@ export async function GET(request: Request) {
         const dbTime = result.rows[0]?.current_time;
         const responseTime = Date.now() - startTime;
 
-        console.log(`[Keep-Alive] Database pinged successfully at ${dbTime} (${responseTime}ms)`);
+        console.log(`[Keep-Alive] Database pinged at ${dbTime} (${responseTime}ms)`);
 
         await pool.end();
 
