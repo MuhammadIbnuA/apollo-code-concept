@@ -1,9 +1,13 @@
 /**
  * API Client
  * Centralized API client for making requests to the backend
+ * Uses Next.js API routes by default (for Vercel)
+ * Set NEXT_PUBLIC_API_URL to use external backend
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+// Use relative path for Vercel (Next.js API routes)
+// Set NEXT_PUBLIC_API_URL for external backend (e.g., http://localhost:4000)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 // ============================================================
 // HELPER FUNCTIONS

@@ -1,7 +1,10 @@
 import axios from "axios";
 
-// Use backend server for Judge0 proxy
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/judge0`;
+// Use Next.js API routes by default (for Vercel)
+// Set NEXT_PUBLIC_API_URL to use external backend (e.g., http://localhost:4000)
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+    ? `${process.env.NEXT_PUBLIC_API_URL}/api/judge0`
+    : '/api/judge0';
 
 export interface ExecutionResult {
     stdout: string | null;
