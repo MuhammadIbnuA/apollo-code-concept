@@ -314,45 +314,148 @@ ${currentQuestion.validationCode}`;
         <div className="flex h-screen w-full bg-[#0f0f16] text-white font-sans overflow-hidden relative">
             {/* Security Start Modal */}
             {showSecurityModal && (
-                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-                    <div className="bg-[#1e1e2e] rounded-xl p-8 max-w-lg mx-4 shadow-2xl border border-[#27273a]">
-                        <div className="text-center mb-6">
-                            <Shield className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-                            <h2 className="text-2xl font-bold text-white mb-2">
-                                Peraturan Ujian Online
+                <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
+                    <div className="bg-[#1e1e2e] rounded-xl shadow-2xl border border-[#27273a] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                        {/* Header */}
+                        <div className="text-center p-6 border-b border-[#27273a] bg-gradient-to-b from-blue-600/20 to-transparent">
+                            <Shield className="w-14 h-14 text-blue-400 mx-auto mb-3" />
+                            <h2 className="text-2xl font-bold text-white">
+                                📋 Peraturan Ujian Online
                             </h2>
-                            <p className="text-gray-400">
-                                Mohon baca dan pahami peraturan berikut
+                            <p className="text-gray-400 text-sm mt-1">
+                                Baca dengan teliti sebelum memulai ujian
                             </p>
                         </div>
 
-                        <div className="space-y-3 mb-6 text-sm">
-                            <div className="flex items-start gap-3 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                                <Monitor className="w-5 h-5 text-blue-400 mt-0.5" />
-                                <div>
-                                    <p className="font-medium text-white">Mode Fullscreen Wajib</p>
-                                    <p className="text-gray-400">Keluar fullscreen akan dicatat sebagai pelanggaran.</p>
+                        {/* Scrollable Content */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            {/* Penalty Points Section */}
+                            <div className="bg-red-500/10 rounded-xl border border-red-500/30 p-4">
+                                <h3 className="font-bold text-red-400 text-lg mb-3 flex items-center gap-2">
+                                    <AlertTriangle className="w-5 h-5" />
+                                    Sistem Poin Pelanggaran
+                                </h3>
+                                <div className="bg-black/30 rounded-lg p-4 mb-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-white font-medium">Batas Maksimal:</span>
+                                        <span className="text-2xl font-bold text-red-400">{MAX_VIOLATIONS} Pelanggaran</span>
+                                    </div>
+                                    <p className="text-gray-400 text-sm mt-2">
+                                        Jika melebihi batas, ujian akan <strong className="text-red-400">otomatis disubmit</strong>
+                                    </p>
+                                </div>
+
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+                                        <span className="text-gray-300">🚫 Keluar fullscreen</span>
+                                        <span className="text-red-400 font-medium">+1 poin</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+                                        <span className="text-gray-300">🚫 Pindah tab/window</span>
+                                        <span className="text-red-400 font-medium">+1 poin</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+                                        <span className="text-gray-300">🚫 Copy/Paste teks</span>
+                                        <span className="text-red-400 font-medium">+1 poin</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+                                        <span className="text-gray-300">🚫 Buka DevTools (F12)</span>
+                                        <span className="text-red-400 font-medium">+1 poin</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-2 bg-black/20 rounded">
+                                        <span className="text-gray-300">🚫 Klik kanan</span>
+                                        <span className="text-red-400 font-medium">+1 poin</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-                                <Eye className="w-5 h-5 text-yellow-400 mt-0.5" />
-                                <div>
-                                    <p className="font-medium text-white">Aktivitas Dimonitor</p>
-                                    <p className="text-gray-400">Tab switch, copy/paste, dan aktivitas mencurigakan tercatat.</p>
-                                </div>
+                            {/* Do's Section */}
+                            <div className="bg-green-500/10 rounded-xl border border-green-500/30 p-4">
+                                <h3 className="font-bold text-green-400 text-lg mb-3 flex items-center gap-2">
+                                    ✅ Yang Boleh Dilakukan
+                                </h3>
+                                <ul className="space-y-2 text-sm text-gray-300">
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-green-400">✓</span>
+                                        Mengetik kode di editor yang disediakan
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-green-400">✓</span>
+                                        Menjalankan kode untuk testing (Run Code)
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-green-400">✓</span>
+                                        Berpindah antar soal menggunakan sidebar
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-green-400">✓</span>
+                                        Melihat hints yang disediakan
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-green-400">✓</span>
+                                        Submit ujian sebelum waktu habis
+                                    </li>
+                                </ul>
                             </div>
 
-                            <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-                                <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5" />
-                                <div>
-                                    <p className="font-medium text-white">Batas Pelanggaran: {MAX_VIOLATIONS}x</p>
-                                    <p className="text-gray-400">Lebih dari itu ujian otomatis disubmit.</p>
-                                </div>
+                            {/* Don'ts Section */}
+                            <div className="bg-yellow-500/10 rounded-xl border border-yellow-500/30 p-4">
+                                <h3 className="font-bold text-yellow-400 text-lg mb-3 flex items-center gap-2">
+                                    ⚠️ Yang Tidak Boleh Dilakukan
+                                </h3>
+                                <ul className="space-y-2 text-sm text-gray-300">
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-red-400">✗</span>
+                                        Keluar dari mode fullscreen (tekan ESC)
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-red-400">✗</span>
+                                        Membuka tab/window lain saat ujian
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-red-400">✗</span>
+                                        Copy-paste dari sumber eksternal
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-red-400">✗</span>
+                                        Membuka Developer Tools (F12)
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-red-400">✗</span>
+                                        Screenshot atau screen recording
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <span className="text-red-400">✗</span>
+                                        Menggunakan keyboard shortcut terlarang
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Info Section */}
+                            <div className="bg-blue-500/10 rounded-xl border border-blue-500/30 p-4">
+                                <h3 className="font-bold text-blue-400 text-lg mb-3 flex items-center gap-2">
+                                    <Monitor className="w-5 h-5" />
+                                    Informasi Sistem
+                                </h3>
+                                <ul className="space-y-2 text-sm text-gray-300">
+                                    <li className="flex items-center gap-2">
+                                        <Eye className="w-4 h-4 text-blue-400" />
+                                        Semua aktivitas dimonitor dan dicatat
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <Shield className="w-4 h-4 text-blue-400" />
+                                        Device fingerprint akan disimpan
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                        <Clock className="w-4 h-4 text-blue-400" />
+                                        Timer berjalan otomatis setelah mulai
+                                    </li>
+                                </ul>
                             </div>
                         </div>
 
-                        <div className="text-center">
+                        {/* Footer */}
+                        <div className="p-6 border-t border-[#27273a] bg-[#161622]">
                             <button
                                 onClick={async () => {
                                     const success = await requestFullscreen();
@@ -362,12 +465,12 @@ ${currentQuestion.validationCode}`;
                                         alert('Tidak dapat masuk fullscreen. Browser mungkin tidak mendukung.');
                                     }
                                 }}
-                                className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors text-lg"
+                                className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold rounded-xl transition-all text-lg shadow-lg shadow-blue-500/20"
                             >
-                                🚀 Mulai Ujian
+                                🚀 Saya Mengerti, Mulai Ujian
                             </button>
-                            <p className="text-xs text-gray-500 mt-3">
-                                Dengan menekan tombol di atas, Anda menyetujui peraturan ujian
+                            <p className="text-xs text-gray-500 mt-3 text-center">
+                                Dengan menekan tombol di atas, Anda menyetujui semua peraturan ujian
                             </p>
                         </div>
                     </div>
