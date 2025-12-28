@@ -13,7 +13,7 @@ import { useExamSecurity, Violation } from "@/hooks/useExamSecurity";
 // Let's use dynamic import here to be safe and explicit.
 const CodeEditor = dynamic(() => import("@/components/Editor/CodeEditor"), {
     ssr: false,
-    loading: () => <div className="h-full w-full flex items-center justify-center text-gray-500 bg-[#1e1e2e]">Loading Editor...</div>
+    loading: () => <div className="h-full w-full flex items-center justify-center text-muted-foreground bg-card">Loading Editor...</div>
 });
 
 interface ExamInterfaceProps {
@@ -254,37 +254,37 @@ ${currentQuestion.validationCode}`;
 
     if (showResults) {
         return (
-            <div className="flex min-h-screen w-full items-center justify-center bg-[#0f0f16] text-white p-4">
-                <div className="bg-[#1e1e2e] p-8 rounded-xl border border-[#27273a] text-center max-w-2xl w-full">
-                    <CheckCircle size={64} className="mx-auto text-green-500 mb-4" />
-                    <h2 className="text-3xl font-bold mb-2">Exam Submitted!</h2>
-                    <p className="text-gray-400 mb-6">Thank you, {studentName}.</p>
+            <div className="flex min-h-screen w-full items-center justify-center bg-background text-foreground p-4">
+                <div className="bg-card p-8 rounded-xl border border-border text-center max-w-2xl w-full shadow-lg">
+                    <CheckCircle size={64} className="mx-auto text-success mb-4" />
+                    <h2 className="text-3xl font-bold text-foreground mb-2">Exam Submitted!</h2>
+                    <p className="text-muted-foreground mb-6">Thank you, {studentName}.</p>
 
-                    <div className="bg-[#161622] p-6 rounded-lg mb-6 border border-[#27273a]">
-                        <div className="text-sm text-gray-500 uppercase font-bold mb-1">Your Score</div>
-                        <div className="text-5xl font-bold text-blue-400">
-                            {finalScore} <span className="text-xl text-gray-600">/ {totalPoints}</span>
+                    <div className="bg-muted p-6 rounded-lg mb-6 border border-border">
+                        <div className="text-sm text-muted-foreground uppercase font-bold mb-1">Your Score</div>
+                        <div className="text-5xl font-bold text-primary">
+                            {finalScore} <span className="text-xl text-muted-foreground">/ {totalPoints}</span>
                         </div>
                     </div>
 
                     {/* Score Breakdown */}
                     {Object.keys(gradeDetails).length > 0 && (
-                        <div className="bg-[#161622] p-4 rounded-lg mb-6 border border-[#27273a] text-left">
-                            <h3 className="text-sm text-gray-500 uppercase font-bold mb-3">Score Breakdown</h3>
+                        <div className="bg-muted p-4 rounded-lg mb-6 border border-border text-left">
+                            <h3 className="text-sm text-muted-foreground uppercase font-bold mb-3">Score Breakdown</h3>
                             <div className="space-y-3">
                                 {exam.questions.map((q, idx) => {
                                     const grade = gradeDetails[q.id];
                                     if (!grade) return null;
                                     const passed = grade.score === grade.maxScore;
                                     return (
-                                        <div key={q.id} className="flex items-center justify-between p-3 bg-[#0f0f16] rounded-lg">
+                                        <div key={q.id} className="flex items-center justify-between p-3 bg-background rounded-lg">
                                             <div>
-                                                <span className="text-gray-400 text-sm">Q{idx + 1}:</span>
-                                                <span className="text-white ml-2 font-medium">{q.title}</span>
+                                                <span className="text-muted-foreground text-sm">Q{idx + 1}:</span>
+                                                <span className="text-foreground ml-2 font-medium">{q.title}</span>
                                             </div>
                                             <div className={cn(
                                                 "font-bold px-3 py-1 rounded",
-                                                passed ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                                                passed ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"
                                             )}>
                                                 {grade.score} / {grade.maxScore}
                                             </div>
@@ -295,13 +295,13 @@ ${currentQuestion.validationCode}`;
                         </div>
                     )}
 
-                    <p className="text-sm text-gray-400 mb-6">
+                    <p className="text-sm text-muted-foreground mb-6">
                         Your results have been recorded. You may close this tab or return to the dashboard.
                     </p>
 
                     <button
                         onClick={() => window.location.href = '/'}
-                        className="w-full py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-bold"
+                        className="w-full py-3 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-bold"
                     >
                         Return to Home
                     </button>
@@ -311,18 +311,18 @@ ${currentQuestion.validationCode}`;
     }
 
     return (
-        <div className="flex h-screen w-full bg-[#0f0f16] text-white font-sans overflow-hidden relative">
+        <div className="flex h-screen w-full bg-background text-foreground font-sans overflow-hidden relative">
             {/* Security Start Modal */}
             {showSecurityModal && (
-                <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
-                    <div className="bg-[#1e1e2e] rounded-xl shadow-2xl border border-[#27273a] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+                <div className="fixed inset-0 bg-background/95 flex items-center justify-center z-50 p-4">
+                    <div className="bg-card rounded-xl shadow-2xl border border-border max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
                         {/* Header */}
-                        <div className="text-center p-6 border-b border-[#27273a] bg-gradient-to-b from-blue-600/20 to-transparent">
-                            <Shield className="w-14 h-14 text-blue-400 mx-auto mb-3" />
-                            <h2 className="text-2xl font-bold text-white">
+                        <div className="text-center p-6 border-b border-border bg-gradient-to-b from-primary/20 to-transparent">
+                            <Shield className="w-14 h-14 text-primary mx-auto mb-3" />
+                            <h2 className="text-2xl font-bold text-foreground">
                                 📋 Peraturan Ujian Online
                             </h2>
-                            <p className="text-gray-400 text-sm mt-1">
+                            <p className="text-muted-foreground text-sm mt-1">
                                 Baca dengan teliti sebelum memulai ujian
                             </p>
                         </div>
@@ -455,7 +455,7 @@ ${currentQuestion.validationCode}`;
                         </div>
 
                         {/* Footer */}
-                        <div className="p-6 border-t border-[#27273a] bg-[#161622]">
+                        <div className="p-6 border-t border-border bg-muted">
                             <button
                                 onClick={async () => {
                                     const success = await requestFullscreen();
@@ -465,11 +465,11 @@ ${currentQuestion.validationCode}`;
                                         alert('Tidak dapat masuk fullscreen. Browser mungkin tidak mendukung.');
                                     }
                                 }}
-                                className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold rounded-xl transition-all text-lg shadow-lg shadow-blue-500/20"
+                                className="w-full px-8 py-4 bg-primary hover:opacity-90 text-primary-foreground font-bold rounded-xl transition-all text-lg shadow-md"
                             >
                                 🚀 Saya Mengerti, Mulai Ujian
                             </button>
-                            <p className="text-xs text-gray-500 mt-3 text-center">
+                            <p className="text-xs text-muted-foreground mt-3 text-center">
                                 Dengan menekan tombol di atas, Anda menyetujui semua peraturan ujian
                             </p>
                         </div>
@@ -492,21 +492,21 @@ ${currentQuestion.validationCode}`;
 
             {/* Fullscreen Exit Prompt */}
             {!isFullscreen && !showSecurityModal && !showResults && (
-                <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-50">
-                    <div className="bg-[#1e1e2e] rounded-xl p-8 max-w-md mx-4 text-center border border-[#27273a]">
-                        <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                        <h2 className="text-xl font-bold text-white mb-2">
+                <div className="fixed inset-0 bg-background/95 flex items-center justify-center z-50">
+                    <div className="bg-card rounded-xl p-8 max-w-md mx-4 text-center border border-border shadow-lg">
+                        <AlertTriangle className="w-16 h-16 text-destructive mx-auto mb-4" />
+                        <h2 className="text-xl font-bold text-foreground mb-2">
                             Mode Fullscreen Required
                         </h2>
-                        <p className="text-gray-400 mb-4">
+                        <p className="text-muted-foreground mb-4">
                             Anda telah keluar dari fullscreen.
                         </p>
-                        <p className="text-red-400 text-sm mb-6">
+                        <p className="text-destructive text-sm mb-6">
                             Pelanggaran: {violations.filter(v => v.type === 'fullscreen_exit').length}/3
                         </p>
                         <button
                             onClick={requestFullscreen}
-                            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors"
+                            className="px-6 py-2 bg-primary hover:opacity-90 text-primary-foreground font-bold rounded-lg transition-colors"
                         >
                             Kembali ke Fullscreen
                         </button>
@@ -532,10 +532,10 @@ ${currentQuestion.validationCode}`;
             )}
 
             {/* Sidebar Navigation (Questions) */}
-            <div className="w-64 border-r border-[#27273a] bg-[#161622] flex flex-col">
-                <div className="p-4 border-b border-[#27273a]">
-                    <h2 className="font-bold text-lg text-blue-400">{exam.title}</h2>
-                    <div className="mt-2 flex items-center gap-2 text-xl font-mono text-yellow-500 bg-yellow-500/10 p-2 rounded justify-center border border-yellow-500/20">
+            <div className="w-64 border-r border-border bg-card flex flex-col">
+                <div className="p-4 border-b border-border">
+                    <h2 className="font-bold text-lg text-primary">{exam.title}</h2>
+                    <div className="mt-2 flex items-center gap-2 text-xl font-mono text-warning bg-warning/10 p-2 rounded justify-center border border-warning/20">
                         <Clock size={20} />
                         {formatTime(timeLeft)}
                     </div>
@@ -549,21 +549,21 @@ ${currentQuestion.validationCode}`;
                             className={cn(
                                 "w-full text-left px-3 py-3 rounded-md text-sm transition-all flex items-center justify-between",
                                 idx === currentQuestionIndex
-                                    ? "bg-blue-600 text-white shadow-lg"
-                                    : "text-gray-400 hover:bg-[#27273a]"
+                                    ? "bg-primary text-primary-foreground shadow-md"
+                                    : "text-muted-foreground hover:bg-muted"
                             )}
                         >
                             <span className="truncate">Q{idx + 1}: {q.title}</span>
-                            {outputs[q.id] && <div className="w-2 h-2 rounded-full bg-green-500"></div>}
+                            {outputs[q.id] && <div className="w-2 h-2 rounded-full bg-success"></div>}
                         </button>
                     ))}
                 </div>
 
-                <div className="p-4 border-t border-[#27273a]">
+                <div className="p-4 border-t border-border">
                     <button
                         onClick={() => handleSubmit(false)}
                         disabled={isSubmitting}
-                        className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="w-full py-3 bg-success hover:opacity-90 text-success-foreground font-bold rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                         {isSubmitting ? "Submitting..." : <><Save size={18} /> Submit Exam</>}
                     </button>
@@ -573,20 +573,20 @@ ${currentQuestion.validationCode}`;
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
                 {/* Header */}
-                <div className="h-14 border-b border-[#27273a] bg-[#161622] flex items-center justify-between px-6">
-                    <h3 className="font-bold text-gray-200">Question {currentQuestionIndex + 1} of {exam.questions.length}</h3>
+                <div className="h-14 border-b border-border bg-card flex items-center justify-between px-6">
+                    <h3 className="font-bold text-foreground">Question {currentQuestionIndex + 1} of {exam.questions.length}</h3>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
                             disabled={currentQuestionIndex === 0}
-                            className="p-2 bg-[#27273a] hover:bg-[#32324a] rounded disabled:opacity-50"
+                            className="p-2 bg-muted hover:bg-muted/80 rounded disabled:opacity-50"
                         >
                             <ChevronLeft size={18} />
                         </button>
                         <button
                             onClick={() => setCurrentQuestionIndex(Math.min(exam.questions.length - 1, currentQuestionIndex + 1))}
                             disabled={currentQuestionIndex === exam.questions.length - 1}
-                            className="p-2 bg-[#27273a] hover:bg-[#32324a] rounded disabled:opacity-50"
+                            className="p-2 bg-muted hover:bg-muted/80 rounded disabled:opacity-50"
                         >
                             <ChevronRight size={18} />
                         </button>
@@ -595,39 +595,39 @@ ${currentQuestion.validationCode}`;
 
                 <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
                     {/* Problem Description */}
-                    <div className="flex-1 lg:w-[40%] overflow-y-auto p-6 border-r border-[#27273a]">
-                        <div className="prose prose-invert max-w-none">
-                            <h1 className="text-2xl font-bold mb-4 text-white">{currentQuestion.title}</h1>
-                            <div className="bg-[#1e1e2e] p-4 rounded-lg border border-[#27273a] mb-6">
-                                <p className="text-gray-300 whitespace-pre-wrap">{currentQuestion.description}</p>
+                    <div className="flex-1 lg:w-[40%] overflow-y-auto p-6 border-r border-border bg-background">
+                        <div className="prose prose-neutral max-w-none">
+                            <h1 className="text-2xl font-bold mb-4 text-foreground">{currentQuestion.title}</h1>
+                            <div className="bg-card p-4 rounded-lg border border-border mb-6">
+                                <p className="text-foreground whitespace-pre-wrap">{currentQuestion.description}</p>
                             </div>
 
-                            <div className="bg-blue-900/10 border border-blue-500/20 p-4 rounded-lg">
-                                <h4 className="text-blue-400 font-bold text-sm uppercase mb-2">Points</h4>
-                                <span className="text-2xl font-bold text-white">{currentQuestion.points}</span>
+                            <div className="bg-primary/10 border border-primary/20 p-4 rounded-lg">
+                                <h4 className="text-primary font-bold text-sm uppercase mb-2">Points</h4>
+                                <span className="text-2xl font-bold text-foreground">{currentQuestion.points}</span>
                             </div>
 
                             {/* Hints Section */}
                             {currentQuestion.hints && (
-                                <div className="bg-yellow-900/10 border border-yellow-500/20 p-4 rounded-lg mt-4">
-                                    <h4 className="text-yellow-400 font-bold text-sm uppercase mb-2 flex items-center gap-2">
+                                <div className="bg-warning/10 border border-warning/20 p-4 rounded-lg mt-4">
+                                    <h4 className="text-warning font-bold text-sm uppercase mb-2 flex items-center gap-2">
                                         <Lightbulb size={16} /> Hints
                                     </h4>
-                                    <p className="text-gray-300 text-sm whitespace-pre-wrap">{currentQuestion.hints}</p>
+                                    <p className="text-foreground text-sm whitespace-pre-wrap">{currentQuestion.hints}</p>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     {/* Editor & Terminal */}
-                    <div className="flex-1 lg:w-[60%] flex flex-col bg-[#0f0f16]">
+                    <div className="flex-1 lg:w-[60%] flex flex-col bg-card">
                         {/* Editor Toolbar */}
-                        <div className="flex items-center justify-between px-4 py-2 bg-[#161622] border-b border-[#27273a]">
-                            <span className="text-xs font-mono text-gray-500">main.py</span>
+                        <div className="flex items-center justify-between px-4 py-2 bg-card border-b border-border">
+                            <span className="text-xs font-mono text-muted-foreground">main.py</span>
                             <button
                                 onClick={handleRun}
                                 disabled={isRunning}
-                                className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-bold transition-all"
+                                className="flex items-center gap-2 px-3 py-1.5 bg-primary hover:opacity-90 text-primary-foreground rounded text-xs font-bold transition-all"
                             >
                                 {isRunning ? "Running..." : <><Play size={14} /> Run Code</>}
                             </button>
@@ -645,15 +645,15 @@ ${currentQuestion.validationCode}`;
                         </div>
 
                         {/* Terminal */}
-                        <div className="h-48 border-t border-[#27273a] bg-[#0c0c12] flex flex-col">
-                            <div className="px-4 py-2 border-b border-[#27273a] bg-[#161622] flex justify-between items-center">
-                                <span className="text-xs font-bold text-gray-400 uppercase">Console Output</span>
+                        <div className="h-48 border-t border-border bg-muted flex flex-col">
+                            <div className="px-4 py-2 border-b border-border bg-card flex justify-between items-center">
+                                <span className="text-xs font-bold text-muted-foreground uppercase">Console Output</span>
                             </div>
-                            <div className="flex-1 p-4 font-mono text-sm overflow-auto text-gray-300">
+                            <div className="flex-1 p-4 font-mono text-sm overflow-auto text-foreground">
                                 {currentOutput ? (
                                     <pre className="whitespace-pre-wrap">{currentOutput}</pre>
                                 ) : (
-                                    <span className="text-gray-600 italic">Run your code to see output...</span>
+                                    <span className="text-muted-foreground italic">Run your code to see output...</span>
                                 )}
                             </div>
                         </div>
@@ -663,18 +663,18 @@ ${currentQuestion.validationCode}`;
 
             {/* Name Modal */}
             {showNameModal && (
-                <div className="absolute inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-                    <div className="bg-[#1e1e2e] border border-gray-700 w-full max-w-sm rounded-xl shadow-2xl p-8 text-center">
-                        <h2 className="text-2xl font-bold text-white mb-2">Identify Yourself</h2>
-                        <p className="text-gray-400 mb-6 text-sm">Please enter your name to submit the exam.</p>
+                <div className="absolute inset-0 z-50 bg-background/90 backdrop-blur-md flex items-center justify-center p-4">
+                    <div className="bg-card border border-border w-full max-w-sm rounded-xl shadow-lg p-8 text-center">
+                        <h2 className="text-2xl font-bold text-foreground mb-2">Identify Yourself</h2>
+                        <p className="text-muted-foreground mb-6 text-sm">Please enter your name to submit the exam.</p>
                         <input
-                            className="w-full bg-black/40 border border-gray-700 rounded p-3 text-white mb-4 text-center focus:border-blue-500 outline-none"
+                            className="w-full bg-background border border-border rounded p-3 text-foreground mb-4 text-center focus:border-primary outline-none"
                             placeholder="Your Name"
                             value={nameInput}
                             onChange={e => setNameInput(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && handleLogin()}
                         />
-                        <button onClick={handleLogin} className="w-full py-2 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-500">
+                        <button onClick={handleLogin} className="w-full py-2 bg-primary text-primary-foreground font-bold rounded-md hover:opacity-90">
                             Continue
                         </button>
                     </div>
