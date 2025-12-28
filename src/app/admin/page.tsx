@@ -22,36 +22,36 @@ export default function AdminDashboard() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#0f0f16] text-white p-8">
+        <div className="min-h-screen bg-background text-foreground p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-3xl font-bold">Exam Administration</h1>
+                    <h1 className="text-3xl font-bold text-foreground">Exam Administration</h1>
                     <button
                         onClick={() => window.location.href = '/admin/exam/editor/new'}
-                        className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-bold"
+                        className="bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-lg flex items-center gap-2 font-bold shadow-sm"
                     >
                         <Plus size={20} /> Create New Exam
                     </button>
                 </div>
 
                 {loading ? (
-                    <div className="text-center text-gray-500 py-10">Loading exams...</div>
+                    <div className="text-center text-muted-foreground py-10">Loading exams...</div>
                 ) : (
                     <div className="grid gap-4">
                         {exams.length === 0 ? (
-                            <div className="bg-[#1e1e2e] p-8 rounded-lg text-center text-gray-400 border border-[#27273a]">
+                            <div className="bg-card p-8 rounded-lg text-center text-muted-foreground border border-border">
                                 No exams found. Create one to get started.
                             </div>
                         ) : (
                             exams.map(exam => (
-                                <div key={exam.id} className="bg-[#1e1e2e] p-6 rounded-lg border border-[#27273a] flex items-center justify-between hover:border-blue-500/50 transition-colors">
+                                <div key={exam.id} className="bg-card p-6 rounded-lg border border-border flex items-center justify-between hover:border-primary/50 transition-colors">
                                     <div>
-                                        <h3 className="text-xl font-bold mb-1">{exam.title}</h3>
-                                        <div className="text-gray-400 text-sm flex gap-4">
-                                            <span>ID: <code className="bg-[#27273a] px-1 rounded">{exam.id}</code></span>
+                                        <h3 className="text-xl font-bold text-foreground mb-1">{exam.title}</h3>
+                                        <div className="text-muted-foreground text-sm flex gap-4">
+                                            <span>ID: <code className="bg-muted px-1 rounded">{exam.id}</code></span>
                                             <span>Duration: {exam.durationMinutes}m</span>
                                             <span>Questions: {exam.questions.length}</span>
-                                            <span className={exam.isPublic ? "text-green-400" : "text-yellow-400"}>
+                                            <span className={exam.isPublic ? "text-success" : "text-warning"}>
                                                 {exam.isPublic ? "Public" : "Draft"}
                                             </span>
                                         </div>
@@ -59,14 +59,14 @@ export default function AdminDashboard() {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => window.location.href = `/admin/exam/${exam.id}/analytics`}
-                                            className="p-2 bg-[#27273a] hover:bg-purple-600/20 text-purple-400 rounded-lg"
+                                            className="p-2 bg-muted hover:bg-secondary/20 text-secondary rounded-lg"
                                             title="View Analytics"
                                         >
                                             <div className="flex items-center gap-1"><span className="text-xs font-bold">Results</span></div>
                                         </button>
                                         <button
                                             onClick={() => window.location.href = `/admin/exam/editor/${exam.id}`}
-                                            className="p-2 bg-[#27273a] hover:bg-blue-600/20 text-blue-400 rounded-lg"
+                                            className="p-2 bg-muted hover:bg-primary/20 text-primary rounded-lg"
                                             title="Edit Exam"
                                         >
                                             <Edit size={20} />
