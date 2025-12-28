@@ -3,10 +3,9 @@
 import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, BookOpen, CheckCircle, Lock, ArrowRight } from 'lucide-react';
-import { COURSES, getLessonsByCourse, getCourseById } from '@/data/courses';
+import { getLessonsByCourse, getCourseById } from '@/data/courses';
 import { useAppContext } from '@/context/AppContext';
 import type { Lesson } from '@/lib/types';
-import { db } from '@/lib/db';
 
 interface PageProps {
     params: Promise<{ courseId: string }>;
@@ -65,10 +64,10 @@ export default function CourseLessonsPage({ params }: PageProps) {
 
     if (!course) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+            <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-white mb-4">Kursus tidak ditemukan</h1>
-                    <Link href="/courses" className="text-purple-400 hover:text-purple-300">
+                    <h1 className="text-2xl font-bold text-foreground mb-4">Kursus tidak ditemukan</h1>
+                    <Link href="/courses" className="text-primary hover:opacity-80">
                         ← Kembali ke daftar kursus
                     </Link>
                 </div>
@@ -77,13 +76,13 @@ export default function CourseLessonsPage({ params }: PageProps) {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="bg-black/20 backdrop-blur border-b border-white/10">
+            <header className="bg-card border-b border-border shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <Link
                         href="/courses"
-                        className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                        className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                         <ArrowLeft size={18} />
                         <span>Kembali ke Kursus</span>
@@ -92,17 +91,17 @@ export default function CourseLessonsPage({ params }: PageProps) {
             </header>
 
             {/* Course Header */}
-            <section className="py-12 px-4 border-b border-white/10">
+            <section className="py-12 px-4 border-b border-border">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center gap-6">
                         <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${course.color} flex items-center justify-center text-4xl`}>
                             {course.icon}
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-white mb-2">
+                            <h1 className="text-3xl font-bold text-foreground mb-2">
                                 {course.title}
                             </h1>
-                            <p className="text-gray-400">
+                            <p className="text-muted-foreground">
                                 {course.description}
                             </p>
                         </div>
@@ -111,15 +110,15 @@ export default function CourseLessonsPage({ params }: PageProps) {
             </section>
 
             {/* Progress Bar */}
-            <section className="py-6 px-4 border-b border-white/10">
+            <section className="py-6 px-4 border-b border-border">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-gray-400">Progress</span>
-                        <span className="text-white">
+                        <span className="text-muted-foreground">Progress</span>
+                        <span className="text-foreground">
                             {completedLessons.filter(id => lessons.some(l => l.id === id)).length} / {lessons.length} lessons
                         </span>
                     </div>
-                    <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                         <div
                             className={`h-full bg-gradient-to-r ${course.color} transition-all duration-500`}
                             style={{
@@ -136,12 +135,12 @@ export default function CourseLessonsPage({ params }: PageProps) {
             <section className="py-8 px-4">
                 <div className="max-w-4xl mx-auto">
                     {loading ? (
-                        <div className="text-center text-gray-400 py-12">
-                            <div className="animate-spin w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
+                        <div className="text-center text-muted-foreground py-12">
+                            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
                             Loading lessons...
                         </div>
                     ) : lessons.length === 0 ? (
-                        <div className="text-center text-gray-400 py-12">
+                        <div className="text-center text-muted-foreground py-12">
                             <BookOpen size={48} className="mx-auto mb-4 opacity-50" />
                             <p>Belum ada lesson untuk kursus ini</p>
                         </div>
@@ -155,18 +154,18 @@ export default function CourseLessonsPage({ params }: PageProps) {
                                     <Link
                                         key={lesson.id}
                                         href={isLocked ? '#' : `/learn/${courseId}/${lesson.id}`}
-                                        className={`block bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4 transition-all duration-300 ${isLocked
-                                                ? 'opacity-50 cursor-not-allowed'
-                                                : 'hover:bg-white/10 hover:border-white/20'
+                                        className={`block bg-card border border-border rounded-xl p-4 transition-all duration-300 ${isLocked
+                                            ? 'opacity-50 cursor-not-allowed'
+                                            : 'hover:shadow-md hover:border-primary/30'
                                             }`}
                                     >
                                         <div className="flex items-center gap-4">
                                             {/* Lesson Number */}
                                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold ${isCompleted
-                                                    ? 'bg-green-500/20 text-green-400'
-                                                    : isLocked
-                                                        ? 'bg-gray-500/20 text-gray-400'
-                                                        : `bg-gradient-to-br ${course.color} text-white`
+                                                ? 'bg-success/20 text-success'
+                                                : isLocked
+                                                    ? 'bg-muted text-muted-foreground'
+                                                    : `bg-gradient-to-br ${course.color} text-white`
                                                 }`}>
                                                 {isCompleted ? (
                                                     <CheckCircle size={24} />
@@ -179,10 +178,10 @@ export default function CourseLessonsPage({ params }: PageProps) {
 
                                             {/* Lesson Info */}
                                             <div className="flex-1">
-                                                <h3 className="text-lg font-semibold text-white mb-1">
+                                                <h3 className="text-lg font-semibold text-foreground mb-1">
                                                     {lesson.title}
                                                 </h3>
-                                                <p className="text-sm text-gray-400">
+                                                <p className="text-sm text-muted-foreground">
                                                     {lesson.description}
                                                 </p>
                                             </div>
@@ -191,7 +190,7 @@ export default function CourseLessonsPage({ params }: PageProps) {
                                             {!isLocked && (
                                                 <ArrowRight
                                                     size={20}
-                                                    className="text-gray-400 group-hover:text-white transition-colors"
+                                                    className="text-muted-foreground"
                                                 />
                                             )}
                                         </div>
